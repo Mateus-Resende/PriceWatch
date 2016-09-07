@@ -29,6 +29,6 @@ class SpiderEletrosom(scrapy.Spider):
 			else:
 				yield link_data
 
-		link_next = response.css('div.next a::attr("href")').extract_first()
-		if link_next:
-			yield scrapy.Request(link_next)
+		#link_next = response.css('div.next a::attr("href")').extract_first()
+		#if link_next:
+		yield scrapy.Request("http://www.eletroshopping.com.br/Loja/Informatica/Notebooks-Ultrabooks/49-82?p=2&limit=24&ordenacao=&Fabricante=&Filtros=&precode=&precoate=&tamanho=&cor=")
