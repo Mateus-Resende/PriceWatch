@@ -8,7 +8,7 @@ f = open('invalid_links.json', 'wb')
 class SpiderRicardoEletro(scrapy.Spider):
 
   name = 'spider'
-  start_urls = ['http://www.ricardoeletro.com.br/Busca/Resultado/?loja=&q=notebook']
+  start_urls = ['http://www.ricardoeletro.com.br/Loja/Informatica/Notebooks-Ultrabooks/49-82?p=1&limit=24&ordenacao=&Fabricante=&Filtros=&precode=&precoate=&tamanho=&cor=']
   download_delay = 1.5
 
   def parse(self, response):
@@ -29,6 +29,6 @@ class SpiderRicardoEletro(scrapy.Spider):
       else:
         yield link_data
 
-    link_next = response.xpath('').extract_first()
+    link_next = response.css('a.avancar::attr("href")').extract_first()
     if link_next:
       yield scrapy.Request(link_next)
