@@ -1,0 +1,34 @@
+import scrapy
+import json
+import re
+
+f = open('invalid_links.json', 'wb')
+
+class SpiderAsus(scrapy.Spider):
+
+	name = 'spider'
+	starts_urls = ['http://www.fastshop.com.br/loja/informatica/notebook']
+
+	download_delay = 1.5
+
+	def parse(self, reponse):
+		for vitrine in responde.css()
+			link_data = {
+
+				"link": vitrine.css('a::attr("href")').extract_first(),		#Tem que pegar a paginação correta no lugar do attr
+				"name": vitrine.css('a::attr("title")').extract_first()		#Tem que pegar a paginação correta no lugar do attr
+
+			}
+
+			notebook_validacao = "(#Escreve aqui dentro as restrições para não entrar)"
+
+			if re.search(notebook_validacao, link_data['name'], re.IGNORECASE): 
+				f.write(json.dumps(link_data) + '\n')
+
+			else:
+				yield link_data
+
+		link_next = response.css('li.next a::attr("href")').extract_first()		#Tem que pegar a paginação correta no lugar do attr
+		if link_next: 
+			yield scrapy.Request(link_next)
+
