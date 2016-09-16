@@ -20,18 +20,19 @@
 	align-items: center;
 }
 .product_container_left {
-	display: flex;
-	align-items: center;
-	justify-content: flex-start;
-	width: calc(100% - 48px);
-	overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: calc(100% - 48px);
+    overflow: hidden;
+    flex-wrap: nowrap;
+    flex-direction: row;
 }
 .image_zoom {
-	width: 68px;
-	height: 68px;
-	overflow: hidden;
-	position: relative;
-	margin: 0 16px;
+    width: 128px;
+    overflow: hidden;
+    margin: 0 16px;
+    position: relative;
 }
 .image_zoom:hover .image_zoom_button {
 	opacity: 1;
@@ -50,9 +51,6 @@
 .image_zoom_button .material-icons {
 	font-size: 24pt;
 	color: white;
-}
-.product_description {
-	white-space: nowrap;
 }
 .product_show_stores {
 	width: 48px;
