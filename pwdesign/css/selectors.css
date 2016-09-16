@@ -6,27 +6,33 @@
 	display: flex;
 }
 #selectors {
-	background: #daecc5;
+    background: #daecc5;
+    width: 100%;
+    overflow: hidden;
+    min-height: 400px;
 }
 .selectors {
-	background: #8BC34A;
-	width: 300px;
-	padding: 20px;
-	border-radius: 4px;
-	box-shadow: 0 7px 9px -2px rgba(0, 0, 0, 0.34);
-	overflow: hidden;
-	margin: 0 12px 0 0;
-	display: flex;
+    background: #8BC34A;
+    width: 300px;
+    padding: 20px;
+    border-radius: 4px;
+    box-shadow: 0 7px 9px -2px rgba(0, 0, 0, 0.34);
+    margin: 0 12px 0 0;
+    display: flex;
+    justify-content: flex-start;
+    align-items: baseline;
+    flex-direction: column;
 }
 .selectors > legend {
-	width: 300px;
-	top: 29px;
-	margin-bottom: 29px;
-	position: relative;
-	font: bold 18pt Raleway;
-	line-height: 16pt;
-	color: rgba(255, 255, 255, 0.7);
-	white-space: nowrap;
+    width: 300px;
+    top: 29px;
+    margin-bottom: 29px;
+    position: relative;
+    font: bold 18pt Raleway;
+    line-height: 16pt;
+    color: rgba(255, 255, 255, 0.7);
+    white-space: nowrap;
+    overflow: hidden;
 }
 .selectors > legend:after {
 	content: '';

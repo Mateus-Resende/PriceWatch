@@ -2,10 +2,11 @@
 	CONFIGURAÇÕES da seção de produtos (products)
 ***********************************************************************************************************************************/
 #products {
-	width: 100%;
-	height: auto;
-	padding: 20px;
-	background: #9E9E9E;
+    width: 100%;
+    height: auto;
+    min-height: 400px;
+    padding: 20px;
+    background: #9E9E9E;
 }
 .product_container {
 	margin: 16px;
