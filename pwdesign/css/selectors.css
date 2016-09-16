@@ -1,0 +1,73 @@
+/***********************************************************************************************************************************
+	CONFIGURAÇÕES dos seletores (selectors)
+***********************************************************************************************************************************/
+#select_form {
+	padding: 30px 16px;
+	display: flex;
+}
+#selectors {
+	background: #daecc5;
+}
+.selectors {
+	background: #8BC34A;
+	width: 300px;
+	padding: 20px;
+	border-radius: 4px;
+	box-shadow: 0 7px 9px -2px rgba(0, 0, 0, 0.34);
+	overflow: hidden;
+	margin: 0 12px 0 0;
+	display: flex;
+}
+.selectors > legend {
+	width: 300px;
+	top: 29px;
+	margin-bottom: 29px;
+	position: relative;
+	font: bold 18pt Raleway;
+	line-height: 16pt;
+	color: rgba(255, 255, 255, 0.7);
+	white-space: nowrap;
+}
+.selectors > legend:after {
+	content: '';
+	width: 100px;
+	height: 40px;
+	background: linear-gradient(to left, #8BC34A, transparent);
+	position: absolute;
+	right: -20px;
+	margin-top: -6px;
+}
+.selectors_label {
+	color: white;
+	font: bold 12pt 'Raleway', sans-serif;
+	letter-spacing: 1px;
+}
+.selectors_label > input {
+	margin: 0 10px 10px 0;
+}
+#sel_control_buttons {
+	margin: 0 16px;
+	display: flex;
+	justify-content: flex-start;
+	top: -16px;
+	position: relative;
+}
+.sel_control_buttons {
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+	background: #009688;
+	box-shadow: 0 7px 9px -2px rgba(0, 0, 0, 0.34);
+	transform: scale(1);
+	transition-timing-function: cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+.sel_control_buttons:active {
+	transform: scale(0.8);
+}
+.sel_control_buttons .material-icons {
+	font: bold 24pt 'Material Icons';
+	color: white;
+}
+#sel_next_button {
+	margin-left: 10px;
+}

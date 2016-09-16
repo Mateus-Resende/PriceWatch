@@ -1,0 +1,196 @@
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="theme-color" content="#10e4c5">
+<meta name="viewport" content="width=device-width">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Raleway|Roboto:300,400,700" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="css/index.css">
+<link rel="stylesheet" type="text/css" href="css/slide.css">
+<link rel="stylesheet" type="text/css" href="css/selectors.css">
+<link rel="stylesheet" type="text/css" href="css/products.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script src="js/index.js"></script>
+<script src="js/expand_store_buttons_controller.js"></script>
+</head>
+<body>
+
+<!-- CABEÇALHO DA PÁGINA
+		* CONTÉM A BARRA DO TOPO (TOOLBAR)
+		* CONTÉM O SLIDE QUE PODERIA TER NO SITE
+	-->
+<header id="pag_header">
+	<div id="pag_toolbar">
+		<h2 id="pag_name">PriceWatch</h2>
+	</div>
+	<div id="pag_slide">
+		<div id="slide_content">
+			<div id="slide_img_container"> <img src="mid/imagens/img1.jpg"> </div>
+			<h5 id="slide_title">Notebook Vaio Intel i3 Processador Quad-Core 4GB HD 1TB Prateado</h5>
+			<h3 id="slide_price">R$ 2.199,99</h3>
+		</div>
+	</div>
+</header>
+
+<!-- CONTEÚDO PRINCIPAL DA PÁGINA 
+		* CONTÉM AS DIVS COM OS SELETORES (SELECTORS) DENTRO DE UM FORMULÁRIO QUE PODE SER ENCAMINHADO COM OS VALORES PARA BUSCA NO BANCO
+		* CONTÉM O CAMPO QUE IRÁ RETORNAR PRODUTOS ENCONTRADOS NO BANCO (PRODUCTS)
+	-->
+<section id="pag_section">
+	<section id="selectors">
+		<form method="post" id="select_form">
+			<fieldset id="select_brand" class="selectors">
+				<legend>Selecione as marcas:</legend>
+				<label class="selectors_label" for="brand1">
+					<input type="checkbox" name="brand" id="brand1" value="1" />
+					Acer </label>
+				<label class="selectors_label" for="brand2">
+					<input type="checkbox" name="brand" id="brand2" value="2" />
+					Apple </label>
+				<label class="selectors_label" for="brand3">
+					<input type="checkbox" name="brand" id="brand3" value="3" />
+					HP </label>
+				<label class="selectors_label" for="brand4">
+					<input type="checkbox" name="brand" id="brand4" value="4" />
+					Positivo </label>
+				<label class="selectors_label" for="brand5">
+					<input type="checkbox" name="brand" id="brand5" value="5" />
+					Lenovo </label>
+				<label class="selectors_label" for="brand6">
+					<input type="checkbox" name="brand" id="brand6" value="6" />
+					Samsung </label>
+				<label class="selectors_label" for="brand7">
+					<input type="checkbox" name="brand" id="brand7" value="7" />
+					Toshiba </label>
+			</fieldset>
+			<fieldset id="select_storage" class="selectors">
+				<legend>Quantidade de armazenamento:</legend>
+				<label class="selectors_label" for="storage1">
+					<input type="checkbox" name="storage" id="storage1" value="1" />
+					100GB </label>
+				<label class="selectors_label" for="storage2">
+					<input type="checkbox" name="storage" id="storage2" value="2" />
+					320GB </label>
+				<label class="selectors_label" for="storage3">
+					<input type="checkbox" name="storage" id="storage3" value="3" />
+					500GB </label>
+				<label class="selectors_label" for="storage4">
+					<input type="checkbox" name="storage" id="storage4" value="4" />
+					720GB </label>
+				<label class="selectors_label" for="storage5">
+					<input type="checkbox" name="storage" id="storage5" value="5" />
+					1000GB </label>
+				<label class="selectors_label" for="storage6">
+					<input type="checkbox" name="storage" id="storage6" value="6" />
+					1500GB </label>
+			</fieldset>
+			<fieldset id="select_processor" class="selectors">
+				<legend>Processador:</legend>
+				<label class="selectors_label" for="processor1">
+					<input type="checkbox" name="processor" id="processor1" value="1" />
+					2.0 GHz </label>
+				<label class="selectors_label" for="processor2">
+					<input type="checkbox" name="processor" id="processor2" value="2" />
+					2.2 GHz </label>
+				<label class="selectors_label" for="processor3">
+					<input type="checkbox" name="processor" id="processor3" value="3" />
+					2.6 GHz </label>
+				<label class="selectors_label" for="processor4">
+					<input type="checkbox" name="processor" id="processor4" value="4" />
+					3.0 GHz </label>
+				<label class="selectors_label" for="processor5">
+					<input type="checkbox" name="processor" id="processor5" value="5" />
+					3.5 GHz </label>
+			</fieldset>
+		</form>
+		<div id="sel_control_buttons">
+			<button class="sel_control_buttons" id="sel_prev_button"><i class="material-icons">keyboard_arrow_left</i></button>
+			<button class="sel_control_buttons" id="sel_next_button"><i class="material-icons">keyboard_arrow_right</i></button>
+		</div>
+	</section>
+	<section id="products">
+		<div class="product_container" id="product_1">
+			<div class="product_container_sub">
+				<div class="product_container_left">
+					<h5 class="product_count">1</h5>
+					<div class="image_zoom"> <img src="mid/imagens/img1.jpg" alt="" class="product_image">
+						<button class="image_zoom_button"><i class="material-icons">zoom_in</i></button>
+					</div>
+					<h4 class="product_description">Notebook Vaio Intel i3 Processador Quad-Core 4GB HD 1TB Prateado</h4>
+				</div>
+				<div class="product_container_right">
+					<button class="product_show_stores"><i class="material-icons">add</i></button>
+				</div>
+			</div>
+			<div class="product_container_stores"> <a class="store_product_link" href="link_para_a_loja">
+				<div class="store">
+					<h5 class="store_name">Casas Bahia</h5>
+					<img src="mid/imagens/logo_casasbahia.jpg" alt="" class="store_logo">
+					<h3 class="store_product_price">R$1.299,99</h3>
+					<div class="store_external_link">
+						<button class="external_link"><i class="material-icons">open_in_new</i></button>
+						<h4 class="external_link_description">Ver produto no site da loja</h4>
+					</div>
+				</div>
+				</a> <a class="store_product_link" href="link_para_a_loja">
+				<div class="store">
+					<h5 class="store_name">Shoptime</h5>
+					<img src="mid/imagens/logo_shoptime.jpg" alt="" class="store_logo">
+					<h3 class="store_product_price">R$1.339,90</h3>
+					<div class="store_external_link">
+						<button class="external_link"><i class="material-icons">open_in_new</i></button>
+						<h4 class="external_link_description">Ver produto no site da loja</h4>
+					</div>
+				</div>
+				</a> <a class="store_product_link" href="link_para_a_loja">
+				<div class="store">
+					<h5 class="store_name">Ricardo Eletro</h5>
+					<img src="mid/imagens/logo_ricardoeletro.jpg" alt="" class="store_logo">
+					<h3 class="store_product_price">R$1.449,90</h3>
+					<div class="store_external_link">
+						<button class="external_link"><i class="material-icons">open_in_new</i></button>
+						<h4 class="external_link_description">Ver produto no site da loja</h4>
+					</div>
+				</div>
+				</a> </div>
+		</div>
+		<div class="product_container" id="product_2">
+			<div class="product_container_sub">
+				<div class="product_container_left">
+					<h5 class="product_count">2</h5>
+					<div class="image_zoom"> <img src="mid/imagens/img2.jpg" alt="" class="product_image">
+						<button class="image_zoom_button"><i class="material-icons">zoom_in</i></button>
+					</div>
+					<h4 class="product_description">Macbook Air Apple Intel i7 Processador Octa-Core 8GB HD 1.5TB Prateado</h4>
+				</div>
+				<div class="product_container_right">
+					<button class="product_show_stores"><i class="material-icons">add</i></button>
+				</div>
+			</div>
+			<div class="product_container_stores"> <a class="store_product_link" href="link_para_a_loja">
+				<div class="store">
+					<h5 class="store_name">Shoptime</h5>
+					<img src="mid/imagens/logo_shoptime.jpg" alt="" class="store_logo">
+					<h3 class="store_product_price">R$1.339,90</h3>
+					<div class="store_external_link">
+						<button class="external_link"><i class="material-icons">open_in_new</i></button>
+						<h4 class="external_link_description">Ver produto no site da loja</h4>
+					</div>
+				</div>
+				</a> <a class="store_product_link" href="link_para_a_loja">
+				<div class="store">
+					<h5 class="store_name">Ricardo Eletro</h5>
+					<img src="mid/imagens/logo_ricardoeletro.jpg" alt="" class="store_logo">
+					<h3 class="store_product_price">R$1.449,90</h3>
+					<div class="store_external_link">
+						<button class="external_link"><i class="material-icons">open_in_new</i></button>
+						<h4 class="external_link_description">Ver produto no site da loja</h4>
+					</div>
+				</div>
+				</a> </div>
+		</div>
+	</section>
+</section>
+<footer id="pag_footer"> </footer>
+</body>
+</html>
