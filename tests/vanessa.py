@@ -36,8 +36,24 @@ print json.dumps(data, indent=4, sort_keys=True)
 
 
 
-
-
+  id: (BSON object) número de identificação criado pelo próprio mongo,
+  available: (true/false) disponibilidade do produto,
+  brand: (String) marca do produto,
+  color: (String) cor majoritária do produto
+  display_feature: (Array de Strings) tipos de tela (LCD/LED, Touch, 3D, etc),
+  display_size: (String) tamanho de tela,
+  graphics_processor_name: (String) nome da placa de vídeo,
+  graphics_processor: (String) capacidade da placa de vídeo com indicação de unidade(GB, MB, etc),
+  name: (String) título do produto,
+  operating_system: (String) _Windows/MacOS/Linux com a versão e distribuição caso aplicável,
+  price: (Float) preço do produto,
+  processor: (String) processador,
+  ram_memory: (String) memória ram com indicação de unidade (GB, MB etc),
+  screen_resolution: (String) 1366x768 por exemplo,
+  storage: (String) HD com indicação de unidade (TB, GB, MB, etc),
+  storage_type: (String) HD/SSD se disponível,
+  url: (String) url para a página do produto,
+  image_url: (String) url para a imagem principal do produto
 
 
 
