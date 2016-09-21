@@ -114,9 +114,13 @@
 # <a id="OFF-TOPIC">OFF-TOPIC</a>
 
 git pull origin master -> atualiza o código local 
+
 git status -> mostra as mudanças
+
 git add <nome_do_arquivo> / --all -> adiciona arquivos para serem comitados
+
 git commit -m "<mensagem>" -> comita as mudanças locais
+
 git push origin master -> publica mudanças no repositório
 
 
