@@ -1,11 +1,12 @@
+
 # coding: utf-8
 import scrapy
 import json
-# biblioteca para expressões regulares no python
 import re
 
 f = open('invalid_links.json', 'wb')
-class SpiderCasasBahia(scrapy.Spider):
+
+class LinksExtractor(scrapy.Spider):
 
   name = 'spider'
   start_urls = ['http://www.casasbahia.com.br/Informatica/Notebook/?Filtro=C56_C57']
@@ -25,7 +26,7 @@ class SpiderCasasBahia(scrapy.Spider):
       if re.search(notebook_validation, link_data['name'], re.IGNORECASE):
         f.write(json.dumps(link_data) + '\n')
 
-      # ou então, libere para o output do scrapy
+      # # ou então, libere para o output do scrapy
       else:
         yield link_data
 

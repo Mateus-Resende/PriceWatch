@@ -77,6 +77,7 @@
   price: (Float) preço do produto,
   processor: (String) processador,
   ram_memory: (String) memória ram com indicação de unidade (GB, MB etc),
+  sku: (String) número de identificação do produto na página
   screen_resolution: (String) 1366x768 por exemplo,
   storage: (String) HD com indicação de unidade (TB, GB, MB, etc),
   storage_type: (String) HD/SSD se disponível,
