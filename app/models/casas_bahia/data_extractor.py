@@ -32,8 +32,8 @@ class DataExtractor():
         data['processor'] = self.normalize_processor(self.validate_field(data, 'processor'))
         data['brand'] = self.normalize_brand(data['name'])
         selector = CSSSelector('.Memoria-RAM dd')
-        data['ram_memory'] = self.response)
-        data['ram_memory'] = self.normalize_memory(self.validate_field(data, 'ram_memory'))
+        # data['ram_memory'] = self.response)
+        # data['ram_memory'] = self.normalize_memory(self.validate_field(data, 'ram_memory'))
 
 
         return data
