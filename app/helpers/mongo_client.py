@@ -13,9 +13,9 @@ class MongoDB:
   def insert(self, datum):
     inserted = False
     
-    if self.is_valid(datum):
-      self.db.products.insert_one(datum)
-      inserted = True  
+    # if self.is_valid(datum):
+    self.db.products.insert_one(datum)
+    inserted = True  
 
     return inserted
 
