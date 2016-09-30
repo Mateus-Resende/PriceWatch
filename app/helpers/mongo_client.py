@@ -7,7 +7,7 @@ class MongoDB:
   # variável contendo o banco
   def __init__(self):
     self.client = MongoClient()
-    self.db = self.client.PriceWatch
+    self.db = self.client.price_watch
 
   # método de inserção simples, apenas um dado inserido por vez
   def insert(self, datum):
@@ -21,7 +21,7 @@ class MongoDB:
 
   # método de inserção múltipla, vários dados inseridos por vez
   def bulk_insert(data):
-    return self.db.products.inser_many(data)
+    return self.db.products.insert_many(data)
 
   def is_valid(self, datum):
     return (True if (datum['name'] and datum['url'] and 
