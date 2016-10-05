@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import re
-from lxml import html
-from helpers.http_client import HttpClient
 from helpers.processors import Processors
 from helpers.brands import Brands
 from helpers.memory import Memory
+from bs4 import BeautifulSoup
+
 
 class DataExtractor():
 
@@ -15,51 +15,74 @@ class DataExtractor():
         self.brands = Brands()
         self.memory = Memory()
 
-
     #{ _id, available, brand, color, display_feature, display_size, graphics_processor_name, graphics_processor, name, operating_system, price, processor, ram_memory, sku, screen_resolution, storage, storage_type, url, img_url}
 
-    # TODO: display_feature, display_size, graphics_processor_name, graphics_processor, operating_system, screen_resolution, storage_type, img_url 
+    # TODO: display_feature, display_size, graphics_processor_name, graphics_processor, operating_system, screen_resolution, storage_type, img_url
 
     def parse(self):
-        namespaces = {'re': "http://exslt.org/regular-expressions"}
         data = {}
+
+        # produtos das casas bahia
         data['store'] = "casas_bahia"
-        data['name'] = self.response.xpath('//b[@itemprop="name"]/text()')
+
+        # nome do produto
+        data['name'] = self.response.findAll("b", {"itemprop": "name"})
         data['name'] = self.validate_field(data, 'name')
+
+        # url como variavel global da classe
         data['url'] = self.url
-        data['price'] = self.response.xpath('//i[@class="sale price"]/text()')
+
+        # preco do produto
+        data['price'] = self.response.findAll("i", {"class": "sale price"})
         data['price'] = self.normalize_price(data['price'])
-        data['available'] = data['price'] != None and data['price'] != 0.0 
-        data['processor'] = self.response.xpath('//*[@class="Processador"]/dd/text()')
+
+        # disponibilidade: nas casas bahia, se o produto possuir preco, o produto esta disponivel
+        data['available'] = data['price'] != None and data['price'] != 0.0
+
+        # processador
+        data['processor'] = self.response.findAll("", {"class": "Processador"})
         data['processor'] = self.normalize_processor(self.validate_field(data, 'processor'))
+
+        # marca
         data['brand'] = self.normalize_brand(data['name'])
-        data['ram_memory'] = self.response.xpath("//dl[re:test(@class, 'Memoria-RAM.*')]/dd/text()", namespaces={'re': "http://exslt.org/regular-expressions"})
+
+        # memoria ram
+        data['ram_memory'] = self.response.findAll("dl", {"class": "Memoria-RAM"})
         data['ram_memory'] = self.normalize_memory(self.validate_field(data, 'ram_memory'))
+
+        # sku para identificacao
         data['sku'] = self.url.split('?')[0].split('-')[-1].split('.')[0]
-        hd = self.response.xpath("//dl[re:test(@class, 'Disco-rigido--HD-.*')]/dd/text()", namespaces={'re': "http://exslt.org/regular-expressions"})
-        ssd = self.response.xpath("//dl[re:test(@class, 'Memoria-Flash--SSD-.*')]/dd/text()", namespaces={'re': "http://exslt.org/regular-expressions"})
+
+        # armazenamento (SSD/HD)
+        hd = self.response.findAll("dl", {"class": "Disco-rigido--HD-"})
+        ssd = self.response.findAll("dl", {"class": "Memoria-Flash--SSD-"})
         data['storage'] = self.normalize_storage(hd, ssd)
-        data['display_size'] = self.response.xpath("//dl[re:test(@class, 'Tamanho-da-tela.*')]/dd/text()", namespaces={'re': "http://exslt.org/regular-expressions"})
-        data['display_size'] = self.validate_field(data, 'display_size')
+
+        # tamanho de tela
+        data['display_size'] = self.response.findAll("dl", {"class": "Tamanho-da-tela"})
+        data['display_size'] = data['display_size'][0].find('dd').get_text().strip() if (len(data["display_size"]) > 0) else ""
 
         return data
-        
 
     def validate_field(self, data, field):
-        return (data[field][0].strip() if (len(data[field]) > 0) else "")
+        return (data[field][0].get_text().strip() if (len(data[field]) > 0) else "")
 
     def normalize_storage(self, hd, ssd):
-        if (len(hd) > 0): hd = hd[0].strip()
-        if (len(ssd) > 0): ssd = ssd[0].strip()
-        
-        result = ""
+        if (len(hd) > 0):
+            hd = hd[0].find('dd').get_text()
+        if (len(ssd) > 0):
+            ssd = ssd[0].find('dd').get_text()
+
+        result = {}
         if hd != None and len(hd) > 0:
-            result = re.search('\d+.+[TG]B', hd)
-            if result != None: result = result.group()
+            result["HD"] = re.search('\d+.+[TG]B', hd)
+            if result["HD"] != None:
+                result["HD"] = result["HD"].group()
 
         if ssd != None and (len(ssd) > 0) and result == None:
-            result = re.search('\d+.+[TG]B', ssd)
-            if result != None: result = result.group()
+            result["SSD"] = re.search('\d+.+[TG]B', ssd)
+            if result["SSD"] != None:
+                result["SSD"] = result["SSD"].group()
 
         return result
 
@@ -85,12 +108,12 @@ class DataExtractor():
 
     def normalize_price(self, raw_data):
         try:
-            raw_data = raw_data[0].strip() if (len(raw_data) > 0) else ""
+            # transforma 1.000,00 em 1000.00
+            raw_data = raw_data[0].get_text() if (len(raw_data) > 0) else ""
             raw_data = raw_data.replace('.', '').replace(',', '.')
             return float(raw_data)
         except ValueError:
             return 0.0
-
 
     def normalize_brand(self, raw_data):
         # ["Samsung", "Asus", "Acer", "Dell", "Apple", "Positivo", "LG", "Lenovo"]
@@ -111,7 +134,6 @@ class DataExtractor():
             return self.brands.get_lenovo()
         elif (re.search('lg', raw_data, re.IGNORECASE) != None):
             return self.brands.get_lg()
-
 
     def normalize_processor(self, raw_data):
         # ['Intel Core i3', 'Intel Core i5', 'Intel Core i7', 'Intem Pentium Quad Core', 'Intel Baytrail', 'AMD Dual Core', 'Item Atom', 'Intel Core M', 'Intel Celeron']
@@ -151,7 +173,3 @@ class DataExtractor():
 
         elif (re.search("samsung", raw_data, re.IGNORECASE) != None):
             return self.processors.get_samsung()
-          
-        
-
-

@@ -20,10 +20,10 @@ class Memory:
         return "10GB"
 
     def get_12GB(self):
-        return "12Gb"
+        return "12GB"
 
     def get_14GB(self):
-        return "14Gb"
+        return "14GB"
 
     def get_16GB(self):
         return "16GB"
