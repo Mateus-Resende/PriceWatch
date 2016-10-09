@@ -2,7 +2,7 @@
 
 from helpers.processors import Processors
 from helpers.mongo_client import MongoDB
-from models.casas_bahia.data_extractor import DataExtractor
+from models.ibyte_computadores.data_extractor import DataExtractor
 from urllib2 import urlopen
 from bs4 import BeautifulSoup
 
@@ -10,7 +10,7 @@ import json
 
 db = MongoDB()
 # http = HttpClient()
-links_file = open("models/casas_bahia/list_links.json")
+links_file = open("models/ibyte_computadores/list_links.json")
 
 urls_string = links_file.read()
 links_file.close()
