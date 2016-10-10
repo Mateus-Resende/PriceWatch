@@ -4,7 +4,9 @@ from helpers.processors import Processors
 from helpers.mongo_client import MongoDB
 from models.casas_bahia.data_extractor import DataExtractor
 from urllib2 import urlopen
+from urllib2 import HTTPError
 from bs4 import BeautifulSoup
+from pymongo.errors import DuplicateKeyError
 
 import json
 
@@ -21,7 +23,12 @@ products_urls = json.loads(urls_string)
 data = []
 
 for product_url in products_urls:
-    bs_obj = BeautifulSoup(urlopen(product_url['link']).read(), "lxml")
-    data_extractor = DataExtractor(bs_obj, product_url['link'])
-    datum = data_extractor.parse()
-    db.insert(datum)
+    try:
+        bs_obj = BeautifulSoup(urlopen(product_url['link']).read(), "lxml")
+        data_extractor = DataExtractor(bs_obj, product_url['link'])
+        datum = data_extractor.parse()
+        db.insert(datum)
+    except HTTPError:
+        continue
+    except DuplicateKeyError:
+        continue
