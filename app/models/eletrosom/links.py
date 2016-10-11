@@ -9,7 +9,7 @@ class SpiderEletrosom(scrapy.Spider):
 
 	name = 'spider'
 	start_urls = ['http://www.eletrosom.com/informatica/notebooks.html']
-	download_delay = 1.5
+	# download_delay = 1.5
 
 	def parse(self, response):
 		for vitrine in response.css('.product'):
@@ -29,6 +29,6 @@ class SpiderEletrosom(scrapy.Spider):
 			else:
 				yield link_data
 
-		link_next = response.css('li.next a::attr("href")').extract_first()
+		link_next = response.css('a.next::attr("href")').extract_first()
 		if link_next:
 			yield scrapy.Request(link_next)

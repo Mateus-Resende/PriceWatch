@@ -77,6 +77,7 @@
   price: (Float) preço do produto,
   processor: (String) processador,
   ram_memory: (String) memória ram com indicação de unidade (GB, MB etc),
+  sku: (String) número de identificação do produto na página
   screen_resolution: (String) 1366x768 por exemplo,
   storage: (String) HD com indicação de unidade (TB, GB, MB, etc),
   storage_type: (String) HD/SSD se disponível,
@@ -112,7 +113,14 @@
 ***
 # <a id="OFF-TOPIC">OFF-TOPIC</a>
 
-Sugestão de editor te textos:
+git pull origin master -> atualiza o código local 
+git status -> mostra as mudanças
+git add <nome_do_arquivo> / --all -> adiciona arquivos para serem comitados
+git commit -m "<mensagem>" -> comita as mudanças locais
+git push origin master -> publica mudanças no repositório
+
+
+Sugestão de editor textos:
   - https://www.sublimetext.com/3 (o que eu uso, opção pessoal)
   - http://limetext.org/
   - https://www.geany.org/Download/Releases
