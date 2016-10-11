@@ -31,6 +31,7 @@ class DataExtractor:
         try:
         	data['name'] = r.find('h1', {'id': 'main-product-name'})
         	data['name'] = self.validate_field(data, 'name')
+        	data['name'] = re.sub(re.compile(u' \(Cód\. ([0-9])+\)'), '', data['name'])
         except (ValueError, TypeError, AttributeError):
         	data['name'] = ''
 		
