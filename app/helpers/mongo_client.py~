@@ -35,6 +35,7 @@ class MongoDB:
 		store['sku'] = dt['sku']
 		store['store'] = dt['store']
 		store['available'] = dt['available']
+		store['url'] = dt['url']
 		
 		# principais para pesquisa
 		prod['ram_memory'] = dt['ram_memory']
