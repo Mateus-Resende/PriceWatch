@@ -60,7 +60,7 @@ class DataExtractor:
 		           
         # marca
         try:
-	        data['brand'] = r.find('th', text=re.compile(r'Processador')).parent.find('td').text
+	        data['brand'] = r.find('th', text=re.compile(r'Marca')).parent.find('td').text
         except (ValueError, TypeError, AttributeError):
         	data['brand'] = ''
 		
