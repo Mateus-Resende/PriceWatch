@@ -42,8 +42,6 @@ class DataExtractor():
             data['price'] = self.normalize_price(data['price'])
         except (ValueError, TypeError, AttributeError):
             data['price'] = 0.0
-
-        print data['price']
         
 
         # disponibilidade: nas casas bahia, se o produto possuir preco, o produto esta disponivel
