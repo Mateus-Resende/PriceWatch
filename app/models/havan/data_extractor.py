@@ -51,7 +51,8 @@ class DataExtractor():
         data['ram_memory'] = self.normalize_memory(self.validate_field(data, 'ram_memory'))
 
         # sku para identificacao
-        data['sku'] = self.url.split('?')[0].split('-')[-1].split('.')[0]
+        data['sku'] = self.response.findAll("", {"class": "skuReference"})
+        data['sku'] = self.validate_field(data, 'sku')
 
         # armazenamento (SSD/HD)
         data['storage'] = self.response.findAll("", {"class": "value-field Capacidade-do-Disco-Rigido-HD-"})
