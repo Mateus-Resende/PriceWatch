@@ -100,15 +100,21 @@
 
 # <a id="Extracao-de-links">Como rodar extração de links?</a>
  * Entre na pasta da loja desejada
- * No terminal digite `scrapy runspider <nome_loja>.py -t json -o - > links_list.json`
+ * No terminal digite `scrapy runspider <nome_loja>.py -t json -o - > list_links.json`
  * A lista de links será gerada dentro do arquivo links_list.json na mesma pasta da loja
  * Faça as devidas validações para guardar somente links válidos (notebooks disponíveis ou não)
 
 ***
 
 # <a id="Extracao-de-dados">Como rodar extração de dados?</a>
+ * Entre na pasta app
+ * No terminal digite `python <nome_loja>.py`
 
-### A ser definido
+***
+
+# <a id="Exportar-db">Como exportar o DB?</a>
+ * Entre na pasta onde você quer criar o arquivo de exportação
+ * No terminal digite `mongoexport --db price_watch --collection products --out nome_do_arquivo.json`
 
 ***
 # <a id="OFF-TOPIC">OFF-TOPIC</a>
