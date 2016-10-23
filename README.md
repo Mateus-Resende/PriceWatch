@@ -9,7 +9,8 @@
 3. [Arquitetura do projeto](#Arquitetura-do-projeto)
 4. [Como rodar extração de links](#Extracao-de-links)
 5. [Como rodar extração de dados](#Extracao-de-dados)
-6. [OFF-Topic](#OFF-TOPIC)
+6. [Como rodar exportar o DB](#Exportar-db)
+7. [OFF-Topic](#OFF-TOPIC)
 
 ***
 # <a id="ambiente-de-desenvolvimento">Ambiente de desenvolvimento</a>
