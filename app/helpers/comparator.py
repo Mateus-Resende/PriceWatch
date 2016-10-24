@@ -30,7 +30,6 @@ class Comparator:
 
         cursor = self.db.products.find({'ram_memory':prod['ram_memory'], 'processor':prod['processor'], 'display_size':prod['display_size'], 'brand':prod['brand']})
         
-        # se o produto já existe então adiciona a loja
         product = next(cursor, None)
 
         parent_product = product
