@@ -18,55 +18,78 @@ class MongoDB:
     # método de inserção múltipla, vários dados inseridos por vez
     def bulk_insert(data):
         return self.db.products.insert_many(data)
-	
+
+    def find(self):
+        return self.db.products.find()
+		
 	# método que compara se um produto com determinadas características já existe, se sim atualiza o seu vetor de lojas, se não simplesmente adiciona com
 	# a primeira loja
     def insert_stores_in_products(self, data):
-		
-		dt = {}
-		
-		for key, value in data.items():
-			dt[key] = value
-		
-		store = {}
-		prod = {}
-				
-		store['price'] = dt['price']
-		store['sku'] = dt['sku']
-		store['store'] = dt['store']
-		store['available'] = dt['available']
-		store['url'] = dt['url']
-		
-		# principais para pesquisa
-		prod['ram_memory'] = dt['ram_memory']
-		prod['processor'] = dt['processor']
-		prod['display_size'] = dt['display_size']
-		prod['brand'] = dt['brand']
-		# outros atributos coletados
-		prod['name'] = dt['name']
-		prod['storage'] = dt['storage']
-		
-		# cursor que irá listar todos os produtos com as quatro características
-		# para fazer a inferência na atualização logo abaixo, o método find deve ter uma quantidade de itens razoável
-		# pois não queremos que ele encontre mais de 1 item, pois para inferir metadados devemos comparar dois itens por vez...
-		# o que foi encontrado no banco e o que está sendo inserido.
-		cursor = self.db.products.find({'ram_memory':prod['ram_memory'], 'processor':prod['processor'], 'display_size':prod['display_size'], 'brand':prod['brand']})
-		
-		# se o produto já existe então adiciona a loja
-		product = next(cursor, None)
-		if product:
-			print("Produto com estas características JÁ existe!")
-			print("Adicionando LOJA in all_stores...")
-			self.db.products.update(
-				{ "_id": product["_id"] },
-				{ "$addToSet": { "all_stores": store }
-			})
-		# se o produto não existe, então primeiro adiciona o produto e em seguida, adiciona a primeira loja
-		else:
-			print("Produto com estas características NÃO existe!")
-			print("Adicionando produto in products...")
-			_id = self.insert(prod)
-			self.db.products.update(
-				{ "_id" : _id },
-				{ "$push": { "all_stores" : store}
-			})
+        dt, store, prod = {}, {}, {}
+
+        for key, value in data.items():
+            dt[key] = value
+
+        store_features = ['price', 'sku', 'store', 'available', 'url']
+        prod_features = ['ram_memory', 'processor', 'display_size', 'brand', 'name', 'storage']
+
+        for key in store_features:
+            store[key] = dt[key]
+            
+        for key in prod_features:
+            prod[key] = dt[key]
+
+        cursor = self.db.products.find({'ram_memory':prod['ram_memory'], 'processor':prod['processor'], 'display_size':prod['display_size'], 'brand':prod['brand']})
+        
+        # se o produto já existe então adiciona a loja
+        product = next(cursor, None)
+
+        parent_product = product
+        parent_change = False
+
+        print(product)
+        
+        for key in prod_features:
+            if product:
+                # produto que está no banco
+                product_feature_invalid = (product[key] == None) or (product[key] == 0) or (product[key] == "") or (product[key] == 0.0)
+                # produto que está para ser inserido
+                prod_feature_invalid = (prod[key] == None) or (prod[key] == 0) or (prod[key] == "") or (prod[key] == 0.0)
+
+                # se o produto que está no banco tem certa característica inválida...
+                if product_feature_invalid:
+                    # porém o produto que está para ser inserido possui está característica...
+                    if (not prod_feature_invalid):
+                        # então atualiza no produto pai
+                        parent_product[key] = prod[key]
+                        parent_change = True
+                        print("Parent PRODUCT will change!")
+        
+        if parent_change:
+            self.db.products.update(
+                {"_id": parent_product["_id"]},
+                {"$set":
+                    {
+                        'ram_memory': parent_product['ram_memory'],
+                        'processor': parent_product['processor'],
+                        'display_size': parent_product['display_size'],
+                        'brand': parent_product['brand'],
+                        'storage': parent_product['storage'],
+                        'name': parent_product['name']
+                    }
+                }
+            )
+
+        if product:
+            print("PRODUCT exists. Adding the STORE...")
+            self.db.products.update(
+                { "_id": product["_id"] },
+                { "$addToSet": { "stores": store, "sub_products": prod }
+            })
+        else:
+            print("PRODUCT not exists. Adding it...")
+            _id = self.insert(prod)
+            self.db.products.update(
+                { "_id" : _id },
+                { "$push": { "stores" : store, "sub_products": prod }
+            })

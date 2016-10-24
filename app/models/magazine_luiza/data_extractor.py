@@ -46,7 +46,7 @@ class DataExtractor:
         
         # disponibilidade
         try:
-        	data['available'] = self.set_available(r)
+        	data['available'] = self.set_available(r, data['price'])
         except (ValueError, TypeError, AttributeError):
         	data['available'] = False
         
@@ -94,11 +94,11 @@ class DataExtractor:
         
         return data
 
-    def set_available(self, response):
+    def set_available(self, response, price):
         meta = response.find('meta', {'itemprop': 'availability'})
         if meta != None:
         	meta = meta['content'].strip()
-        	if meta == 'InStock':
+        	if (meta == 'InStock') and (price != 0.0):
         		return True
         return False
 

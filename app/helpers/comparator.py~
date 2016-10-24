@@ -2,29 +2,18 @@
 from pymongo import MongoClient
 
 # classe intermediária entre o banco de dados e os scripts
-class MongoDB:
+class Comparator:
 
   # variável contendo o banco
     def __init__(self):
         self.client = MongoClient()
-        self.db = self.client.price_watch
-        #self.db.products.all_stores.create_index([("store", 1), ("sku", 1)], unique=True)
-
+        self.db = self.client.price_watch_comparator
 
     # método de inserção simples, apenas um dado inserido por vez
     def insert(self, datum):
         return self.db.products.insert(datum)
 
-    # método de inserção múltipla, vários dados inseridos por vez
-    def bulk_insert(data):
-        return self.db.products.insert_many(data)
-
-    def find(self):
-        return self.db.products.find()
-		
-	# método que compara se um produto com determinadas características já existe, se sim atualiza o seu vetor de lojas, se não simplesmente adiciona com
-	# a primeira loja
-    def insert_stores_in_products(self, data):
+    def compare_it(self, data):
         dt, store, prod = {}, {}, {}
 
         for key, value in data.items():
@@ -46,8 +35,6 @@ class MongoDB:
 
         parent_product = product
         parent_change = False
-
-        print(product)
         
         for key in prod_features:
             if product:
@@ -80,16 +67,19 @@ class MongoDB:
                 }
             )
 
-        if product:
-            print("PRODUCT exists. Adding the STORE...")
-            self.db.products.update(
-                { "_id": product["_id"] },
-                { "$addToSet": { "stores": store, "sub_products": prod }
-            })
-        else:
-            print("PRODUCT not exists. Adding it...")
-            _id = self.insert(prod)
-            self.db.products.update(
-                { "_id" : _id },
-                { "$push": { "stores" : store, "sub_products": prod }
-            })
+        try:
+            if product:
+                print("PRODUCT exists. Adding the STORE...")
+                self.db.products.update(
+                    { "_id": product["_id"] },
+                    { "$addToSet": { "stores": store, "sub_products": prod }
+                })
+            else:
+                print("PRODUCT not exists. Adding it...")
+                _id = self.insert(prod)
+                self.db.products.update(
+                    { "_id" : _id },
+                    { "$push": { "stores" : store, "sub_products": prod }
+                })
+        except:
+            print("Update error!")

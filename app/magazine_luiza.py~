@@ -24,4 +24,4 @@ for product_url in products_urls:
     bs_obj = BeautifulSoup(urlopen(product_url['link']).read(), "lxml")
     data_extractor = DataExtractor(bs_obj, product_url['link'])
     datum = data_extractor.parse()
-    db.insert_stores_in_products(datum)
+    db.insert(datum)
