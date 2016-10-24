@@ -66,6 +66,7 @@ class DataExtractor:
 		# memória ram
         try:
         	data['ram_memory'] = r.find('strong', text=re.compile(u'Memória')).parent.find('div', {'class':'row-fs-right'}).find('p').text
+        	data['ram_memory'] = re.sub('\ ', '', data['ram_memory'])
         except (ValueError, TypeError, AttributeError):
         	data['ram_memory'] = ''
 		

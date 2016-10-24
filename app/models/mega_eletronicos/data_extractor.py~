@@ -22,51 +22,69 @@ class DataExtractor():
     def parse(self):
         data = {}
 
-        # produtos da havan
-        data['store'] = "havan"
+        # produtos das casas bahia
+        data['store'] = "mega"
 
         # nome do produto
-        data['name'] = self.response.findAll("", {"class": "product-qd-v1-name"})
+        data['name'] = self.response.findAll("", {"class": "col-md-12 col-sm-12"})
         data['name'] = self.validate_field(data, 'name')
 
         # url como variavel global da classe
         data['url'] = self.url
 
         # preco do produto
-        data['price'] = self.response.findAll("", {"class": "skuBestPrice"})
+        data['price'] = self.response.findAll("i", {"class": "real"})
         data['price'] = self.normalize_price(data['price'])
 
         # disponibilidade: nas casas bahia, se o produto possuir preco, o produto esta disponivel
         data['available'] = data['price'] != None and data['price'] != 0.0
 
         # processador
-        data['processor'] = self.response.findAll("", {"class": "value-field Modelo-do-Processador"})
+        data['processor'] = self.response.findAll("", {"class": "Processador"})
         data['processor'] = self.normalize_processor(self.validate_field(data, 'processor'))
 
         # marca
         data['brand'] = self.normalize_brand(data['name'])
 
         # memoria ram
-        data['ram_memory'] = self.response.findAll("td", {"class": "value-field Memoria-Fisica-Disponivel"})
+        data['ram_memory'] = self.response.findAll("dl", {"class": "Memoria-RAM"})
         data['ram_memory'] = self.normalize_memory(self.validate_field(data, 'ram_memory'))
 
         # sku para identificacao
-        data['sku'] = self.response.findAll("", {"class": "skuReference"})
-        data['sku'] = self.validate_field(data, 'sku')
+        data['sku'] = self.url.split('?')[0].split('-')[-1].split('.')[0]
 
         # armazenamento (SSD/HD)
-        data['storage'] = self.response.findAll("", {"class": "value-field Capacidade-do-Disco-Rigido-HD-"})
-        data['storage'] = self.validate_field(data, 'storage')
-        #ssd = self.response.findAll("", {"class": "value-field Unidade-de-Estado-Solida-SSD-"})
+        hd = self.response.findAll("dl", {"class": "Disco-rigido--HD-"})
+        ssd = self.response.findAll("dl", {"class": "Memoria-Flash--SSD-"})
+        data['storage'] = self.normalize_storage(hd, ssd)
 
         # tamanho de tela
-        display = self.response.findAll("td", {"class": "value-field Tamanho-da-Tela"})
-        data['display_size'] = self.normalize_display(display) if (len(display) > 0) else ""
+        data['display_size'] = self.response.findAll("dl", {"class": "Tamanho-da-tela"})
+        data['display_size'] = data['display_size'][0].find('dd').get_text().strip() if (len(data["display_size"]) > 0) else ""
 
         return data
 
     def validate_field(self, data, field):
         return (data[field][0].get_text().strip() if (len(data[field]) > 0) else "")
+
+    def normalize_storage(self, hd, ssd):
+        if (len(hd) > 0):
+            hd = hd[0].find('dd').get_text()
+        if (len(ssd) > 0):
+            ssd = ssd[0].find('dd').get_text()
+
+        result = {}
+        if hd != None and len(hd) > 0:
+            result["HD"] = re.search('\d+.+[TG]B', hd)
+            if result["HD"] != None:
+                result["HD"] = result["HD"].group()
+
+        if ssd != None and (len(ssd) > 0) and result == None:
+            result["SSD"] = re.search('\d+.+[TG]B', ssd)
+            if result["SSD"] != None:
+                result["SSD"] = result["SSD"].group()
+
+        return result
 
     def normalize_memory(self, raw_data):
         if (re.search('16', raw_data, re.IGNORECASE) != None):
@@ -92,18 +110,10 @@ class DataExtractor():
         try:
             # transforma 1.000,00 em 1000.00
             raw_data = raw_data[0].get_text() if (len(raw_data) > 0) else ""
-            raw_data = raw_data.replace('.', '').replace(',', '.').replace('R$', '')
+            raw_data = raw_data.replace('.', '').replace(',', '.')
             return float(raw_data)
         except ValueError:
             return 0.0
-
-    def normalize_display(self, raw_data):
-        try:
-            raw_data = raw_data[0].get_text() if (len(raw_data) > 0) else ""
-            raw_data = raw_data.replace('"', '')
-            return raw_data
-        except ValueError:
-            return ""
 
     def normalize_brand(self, raw_data):
         # ["Samsung", "Asus", "Acer", "Dell", "Apple", "Positivo", "LG", "Lenovo"]

@@ -19,6 +19,9 @@ class Processors:
     def get_amd_dual(self):
         return 'AMD Dual Core'
 
+    def get_amd_quad(self):
+        return 'AMD Quad Core'
+
     def get_atom(self):
         return 'Intel Atom'
 
