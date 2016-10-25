@@ -25,3 +25,4 @@ for product_url in products_urls:
     data_extractor = DataExtractor(bs_obj, product_url['link'])
     datum = data_extractor.parse()
     db.insert(datum)
+    #db.insert_stores_in_products(datum)
