@@ -1,3 +1,4 @@
+from tqdm import tqdm
 # coding: utf-8
 
 from helpers.processors import Processors

@@ -1,3 +1,4 @@
+from tqdm import tqdm
 # coding: utf-8
 
 from helpers.processors import Processors
@@ -19,14 +20,19 @@ links_file.close()
 
 products_urls = json.loads(urls_string)
 
+# output = open("models/extra/products.json", "wb")
 data = []
 
-print "\nColetando os dados... ^^"
+print "\nColetando os dados..."
 
-for product_url in products_urls:
-    bs_obj = BeautifulSoup(urlopen(product_url['link']).read(), "lxml")
-    data_extractor = DataExtractor(bs_obj, product_url['link'])
-    datum = data_extractor.parse()
-    db.insert(datum)
+for product_url in tqdm(products_urls):
+	try:
+		bs_obj = BeautifulSoup(urlopen(product_url['link']).read(), "lxml")
+		data_extractor = DataExtractor(bs_obj, product_url['link'])
+		datum = data_extractor.parse()
+		db.insert(datum)
+	except Exception, e:
+		continue
+	sleep(0.01)
 
 print "\nFinalizado! :D"

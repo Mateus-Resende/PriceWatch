@@ -54,13 +54,13 @@ class DataExtractor():
 
         # marca
         try:
-            data['brand'] = r.find('th', text=re.compile(r'Marca')).parent.find('td').text
+            data['brand'] = r.find('th', text=re.compile(r'Marca')).parent.find('td').text.strip()
         except (ValueError, TypeError, AttributeError):
             data['brand'] = ''
 
         # memória ram
         try:
-            data['ram_memory'] = r.find('th', text=re.compile(u'Memória RAM')).parent.find('td').text
+            data['ram_memory'] = r.find('th', text=re.compile(u'Memória RAM')).parent.find('td').text.strip()
         except (ValueError, TypeError, AttributeError):
             data['ram_memory'] = ''
 
@@ -89,7 +89,7 @@ class DataExtractor():
 
         # tamanho da tela
         try:
-            data['display_size'] = r.find('th', text=re.compile(r'Tamanho da Tela')).parent.find('td').text
+            data['display_size'] = r.find('th', text=re.compile(r'Tamanho da Tela')).parent.find('td').text.strip()
         except (ValueError, TypeError, AttributeError):
             data['display_size'] = ''
 
