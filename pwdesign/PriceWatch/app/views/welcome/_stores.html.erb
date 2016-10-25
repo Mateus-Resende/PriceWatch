@@ -1,6 +1,5 @@
 <% 
 	begin
-
 		store_name = @store.store.titleize
 		img_url = @store_name.downcase.delete("_").delete(" ")
 		price = @store.price.round(2).to_s

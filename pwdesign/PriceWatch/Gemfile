@@ -6,6 +6,10 @@ gem 'rails', '4.2.6'
 # MongoDB driver
 gem 'mongoid', github: 'mongoid/mongoid'
 gem 'bson_ext'
+# Paginator
+gem 'will_paginate'#, '3.0.pre2'
+gem 'will_paginate_mongoid'
+gem 'jquery-turbolinks'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
 # Use Uglifier as compressor for JavaScript assets

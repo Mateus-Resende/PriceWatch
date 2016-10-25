@@ -81,8 +81,8 @@ $(function() {
         animateThis(
             stores_cnt,
             "height",
-            { height: "auto", padding: "16px" },
-            { height: "0px", padding: "0px" }
+            { height: "auto" },
+            { height: "0px" }
         );
     });
 });

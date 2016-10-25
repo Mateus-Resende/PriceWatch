@@ -1,4 +1,5 @@
 <div class="products">
+<h1 class="products_title">Resultados da pesquisa: </h1>
 <% @products.each do |product| %>
 	<div class="product">
 		
@@ -6,7 +7,11 @@
 		<div class="product_header">
 			<div class="product_img">
 				<div class="img_box">
-					<img src="<%= product.img_url %>">
+					<%= image_tag(
+						"notebook_example.jpg",
+						:alt => "No image! :(",
+						:title => "Notebook img example")
+					%>
 				</div>
 			</div>
 			<div class="product_name">
@@ -26,6 +31,14 @@
 		</div>
 
 		<div class="product_found_stores">
+			<div class="rol_stores_buttons">
+				<button class="rol_left">
+					<i class="material-icons">&#xE5CB;</i>
+				</button>
+				<button class="rol_right">
+					<i class="material-icons">&#xE5CC;</i>
+				</button>
+			</div>
 			<div class="stores">
 				<% product.stores.each do |store|
 					next if store.available == false
@@ -70,15 +83,29 @@
 			<div class="average_price">
 				
 			</div>
-			<div class="rol_stores_buttons">
-				<button class="rol_left">
-					<i class="material-icons">&#xE5CB;</i>
-				</button>
-				<button class="rol_right">
-					<i class="material-icons">&#xE5CC;</i>
-				</button>
+			<div class="product_features">
+				<h1>Detalhes do produto:</h1>
+				<p>
+					<span class="key">Brand</span>:
+					<span class="value"><%= product.brand %></span>
+				</p>
+				<p>
+					<span class="key">Display size</span>:
+					<span class="value"><%= product.display_size %></span>
+				</p>
+				<p>
+					<span class="key">Ram memory</span>:
+					<span class="value"><%= product.ram_memory %></span>
+				</p>
+				<p>
+					<span class="key">Storage</span>:
+					<span class="value"><%= product.storage %></span>
+				</p>
 			</div>
 		</div>
 	</div>
 <% end %>
+	<div id="products_pagination">
+		<%= will_paginate @products %>
+	</div>
 </div>
