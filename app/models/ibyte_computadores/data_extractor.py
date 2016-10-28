@@ -33,9 +33,10 @@ class DataExtractor():
         # url como variavel global da classe
         data['url'] = self.url
 
-        # preco do produto
-        data['price'] = self.response.findAll("span", {"id": "product-price-37429"})
+        # nome do produto
+        data['price'] = self.response.find("div", {"class": "preco-produto"}).parent.findAll('span', {"class": "price"})
         data['price'] = self.normalize_price(data['price'])
+
 
         # disponibilidade: nas casas bahia, se o produto possuir preco, o produto esta disponivel
         data['available'] = data['price'] != None and data['price'] != 0.0
@@ -99,7 +100,6 @@ class DataExtractor():
 
         if hd != None and len(hd) > 0:
             result["HD"] = re.search('\d+TB', hd)
-            print result
             if result["HD"] != None:
                 result["HD"] = result["HD"].group()
 
