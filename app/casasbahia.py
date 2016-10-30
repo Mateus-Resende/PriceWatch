@@ -7,6 +7,7 @@ from urllib2 import urlopen
 from urllib2 import HTTPError
 from bs4 import BeautifulSoup
 from pymongo.errors import DuplicateKeyError
+from tqdm import tqdm
 
 import json
 
@@ -22,7 +23,7 @@ products_urls = json.loads(urls_string)
 # output = open("models/casas_bahia/products.json", "wb")
 data = []
 
-for product_url in products_urls:
+for product_url in tqdm(products_urls):
     try:
         bs_obj = BeautifulSoup(urlopen(product_url['link']).read(), "lxml")
         data_extractor = DataExtractor(bs_obj, product_url['link'])

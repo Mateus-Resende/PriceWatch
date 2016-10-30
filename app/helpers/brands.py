@@ -24,3 +24,9 @@ class Brands:
 
     def get_lenovo(self):
         return "Lenovo"
+
+    def get_hp(self):
+        return "HP"
+
+    def get_sony(self):
+        return "Sony"

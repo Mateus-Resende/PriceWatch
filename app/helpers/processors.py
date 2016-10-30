@@ -10,6 +10,12 @@ class Processors:
     def get_i7(self):
         return 'Intel Core i7'
 
+    def get_intel_dual(self):
+        return 'Intel Dual Core'
+
+    def get_intel_quad(self):
+        return 'Intel Quad Core'
+
     def get_pentium_quad(self):
         return 'Intem Pentium Quad Core'
 
