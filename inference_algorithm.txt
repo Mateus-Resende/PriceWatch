@@ -1,0 +1,60 @@
+Algoritmo de semelhança
+
+    - distinct em todos os atributos principais (marca, modelo, ean, memória, processador, hd, tamanho de tela)
+    - para cada modelo: busque modelos iguais
+    - criar produto pai baseado nos produtos de modelos iguais
+    - marcar produtos como processados
+    - marca índice de correlação: 1
+    
+    - para cada marca: 
+        - busque produtos com mesmos: 
+            memoria, processador, hd e tamanho de tela
+        - que não foram processados
+    - procurar produto pai que satisfaça
+    - se não encontrar, crie novo produto pai
+    - marcar produtos como processados
+    - marca índice de correlação: 2
+
+    - para cada marca:
+        - busque produtos com mesmos:
+            memoria, processador, hd
+        - que nao foram processados
+    - procurar produto pai que satisfaça
+    - se não encontrar crie um novo produto pai
+    - marcar produtos como processados
+    - marca índice de correlação: 3
+    
+    - para cada marca:
+        - 
+
+
+Modelo produto pai:
+
+{
+    name: "notebook 'marca' 'modelo' 'hd(se existir)' 'memoria(se existir)'",
+    store: [
+        loja1: {
+            preco: 1,
+            url: bla.com,
+            img: 'bla.jpg',
+            id: 123456
+        },
+        loja2: {
+            preco: 2,
+            url: ble.com,
+            img: 'ble.jpg',
+            id: 98765
+        }
+        ...
+
+    ],
+    marca: a,
+    modelo: b,
+    ean: c,
+    memoria: d,
+    processador: e,
+    hd: f,
+    tamanho de tela: g,
+    asdfasdf: iofjdksln,
+    hqiueryoiljs: lskf
+}

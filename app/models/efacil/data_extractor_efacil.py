@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 import re
+from lxml import etree
 from helpers.processors import Processors
 from helpers.brands import Brands
 from helpers.memory import Memory
 from bs4 import BeautifulSoup
+
 
 class DataExtractor():
 
@@ -24,45 +26,47 @@ class DataExtractor():
         r = self.response
 
         # produtos das casas bahia
-        data['store'] = "ibyte_computadores"
+        data['store'] = "efacil"
 
         # nome do produto
-        data['name'] = self.response.findAll("li", {"class": "product"})
+        data['name'] = self.response.findAll("h1", {"class": "livedata"})
         data['name'] = self.validate_field(data, 'name')
 
         # url como variavel global da classe
         data['url'] = self.url
 
-        # nome do produto
-        data['price'] = self.response.find("div", {"class": "preco-produto"}).parent.findAll('span', {"class": "price"})
-        data['price'] = self.normalize_price(data['price'])
-
+        # preço do produto
+        try:
+            data['price'] = r.find('span', {'class': 'special-price'}).parent.find('strong').text
+            #data['price'] = self.normalize_price(data['price'])
+        except (ValueError, TypeError, AttributeError):
+            data['price'] = 0.0
 
         # disponibilidade: nas casas bahia, se o produto possuir preco, o produto esta disponivel
         data['available'] = data['price'] != None and data['price'] != 0.0
 
         try:
             # processador
-            data['processor'] = r.find('td', text=re.compile(r'Processador:')).parent.find('td', {'width': '570'}).text
+            data['processor'] = r.find('th', text=re.compile(r'Processador')).parent.find('td').text
             data['processor'] = self.normalize_processor(data['processor'])
         except (ValueError, TypeError, AttributeError):
             data['processor'] = ''
 
         # marca
         try:
-            data['brand'] = r.find('td', text=re.compile(r'Marca:')).parent.find('td', {'width': '570'}).text.strip()
+            data['brand'] = r.find('th', text=re.compile(r'Marca')).parent.find('td').text
         except (ValueError, TypeError, AttributeError):
             data['brand'] = ''
 
         # memória ram
         try:
-            data['ram_memory'] = r.find('td', text=re.compile(u'Memória RAM:')).parent.find('td', {'width': '570'}).text.strip()
+            data['ram_memory'] = r.find('th', text=re.compile(u'Memória RAM')).parent.find('td').text
         except (ValueError, TypeError, AttributeError):
             data['ram_memory'] = ''
 
         # sku para identificação
         try:
-            data['sku'] = r.find('div', {'class': 'product-essential'}).parent.find('h3').text.split(' ')[-1].split(')')[0]
+            data['sku'] = r.find('input', {'name': 'sku'})['value']
         except (ValueError, TypeError, AttributeError):
             data['sku'] = ''
 
@@ -70,12 +74,12 @@ class DataExtractor():
         try:
         
             try:
-                hd = r.find('td', text=re.compile(r'HD:')).parent.find('td', {'width': '570'}).text
+                hd = r.find('th', text=re.compile(r'Armazenamento ...')).parent.find('td').text
             except (ValueError, TypeError, AttributeError):
                 hd = ''
             
             try:
-                ssd = r.find('td', text=re.compile(r'SSD:')).parent.find('td', {'width': '570'}).text
+                ssd = r.find('th', text=re.compile(r'SSD')).parent.find('td').text
             except (ValueError, TypeError, AttributeError):
                 ssd = ''
             
@@ -85,7 +89,7 @@ class DataExtractor():
 
         # tamanho da tela
         try:
-            data['display_size'] = r.find('td', text=re.compile(r'Polegadas da Tela:')).parent.find('td', {'width': '570'}).text.strip()
+            data['display_size'] = r.find('th', text=re.compile(r'Tamanho da Tela')).parent.find('td').text
         except (ValueError, TypeError, AttributeError):
             data['display_size'] = ''
 
@@ -97,14 +101,13 @@ class DataExtractor():
     def normalize_storage(self, hd, ssd):
 
         result = {}
-
         if hd != None and len(hd) > 0:
-            result["HD"] = re.search('\d+TB', hd)
+            result["HD"] = re.search('\d+.+[TG]B', hd)
             if result["HD"] != None:
                 result["HD"] = result["HD"].group()
 
         if ssd != None and (len(ssd) > 0) and result == None:
-            result["SSD"] = re.search('\d+TB', ssd)
+            result["SSD"] = re.search('\d+.+[TG]B', ssd)
             if result["SSD"] != None:
                 result["SSD"] = result["SSD"].group()
 
@@ -135,7 +138,6 @@ class DataExtractor():
             # transforma 1.000,00 em 1000.00
             raw_data = raw_data[0].get_text() if (len(raw_data) > 0) else ""
             raw_data = raw_data.replace('.', '').replace(',', '.')
-            raw_data = raw_data.replace('R$', '').replace(',', '.')
             return float(raw_data)
         except ValueError:
             return 0.0
