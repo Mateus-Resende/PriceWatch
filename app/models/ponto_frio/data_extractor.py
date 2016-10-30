@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 from helpers.processors import Processors
+from helpers.graphics_processors import Graphics
 from helpers.brands import Brands
 from helpers.memory import Memory
 from bs4 import BeautifulSoup
@@ -12,6 +13,7 @@ class DataExtractor():
         self.response = response
         self.url = url
         self.processors = Processors()
+        self.graphics_processors = Graphics()
         self.brands = Brands()
         self.memory = Memory()
 
@@ -29,6 +31,7 @@ class DataExtractor():
         data['name'] = self.response.findAll("b", {"itemprop": "name"})
         data['name'] = self.validate_field(data, 'name')
 
+
         # url como variavel global da classe
         data['url'] = self.url
 
@@ -39,9 +42,18 @@ class DataExtractor():
         # disponibilidade: se o produto possuir preco, o produto esta disponivel
         data['available'] = data['price'] != None and data['price'] != 0.0
 
+        # cor
+        data['color'] = self.response.findAll("dl", {"class": "Cor"})
+        data['color'] = data['color'][0].find('dd').get_text().strip()
+
         # processador
         data['processor'] = self.response.findAll("", {"class": "Processador"})
         data['processor'] = self.normalize_processor(self.validate_field(data, 'processor'))
+
+        # placa de video
+        data['graphics_processor_name'] = self.response.findAll("dl", {"class": "Placa-de-video"})
+        data['graphics_processor_name'] = data['graphics_processor_name'][0].find('dd').get_text().strip()
+        data['graphics_processor_name'] = self.normalize_graphics_processors(data['graphics_processor_name'])
 
         # marca
         data['brand'] = self.normalize_brand(data['name'])
@@ -134,6 +146,20 @@ class DataExtractor():
             return self.brands.get_lenovo()
         elif (re.search('lg', raw_data, re.IGNORECASE) != None):
             return self.brands.get_lg()
+
+    def normalize_graphics_processors(self, raw_data):
+        
+        # remove erros de enconding (ex: \u84d2)
+        raw_data = re.sub('\\\u\w\w\w\w', '', raw_data)
+
+        if (re.search("Intel", raw_data, re.IGNORECASE) != None):
+            return self.graphics_processors.get_intel()
+
+        elif (re.search("NVIDIA GeForce", raw_data, re.IGNORECASE) != None):
+            return self.graphics_processors.get_geforce()
+
+        elif (re.search("AMD Radeon", raw_data, re.IGNORECASE) != None):
+            return self.graphics_processors.get_amd()
 
     def normalize_processor(self, raw_data):
         # ['Intel Core i3', 'Intel Core i5', 'Intel Core i7', 'Intem Pentium Quad Core', 'Intel Baytrail', 'AMD Dual Core', 'Item Atom', 'Intel Core M', 'Intel Celeron']
