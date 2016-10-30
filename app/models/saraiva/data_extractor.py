@@ -38,7 +38,7 @@ class DataExtractor():
         # preço do produto
         try:
             data['price'] = r.find('span', {'class': 'special-price'}).parent.find('strong').text
-            #data['price'] = self.normalize_price(data['price'])
+            data['price'] = self.normalize_price(data['price'])
         except (ValueError, TypeError, AttributeError):
             data['price'] = 0.0
 
@@ -55,12 +55,14 @@ class DataExtractor():
         # marca
         try:
             data['brand'] = r.find('th', text=re.compile(r'Marca')).parent.find('td').text.strip()
+            data['brand'] = self.normalize_brand(data['brand'])
         except (ValueError, TypeError, AttributeError):
             data['brand'] = ''
 
         # memória ram
         try:
             data['ram_memory'] = r.find('th', text=re.compile(u'Memória RAM')).parent.find('td').text.strip()
+            data['ram_memory'] = self.normalize_memory(data['ram_memory'])
         except (ValueError, TypeError, AttributeError):
             data['ram_memory'] = ''
 

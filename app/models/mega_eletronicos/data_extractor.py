@@ -30,6 +30,7 @@ class DataExtractor():
         ## nome do produto
         try:
             data['name'] = r.find('div', {'class': 'col-md-12 col-sm-12'}).parent.find('h1').text
+            data['name'] = self.validate_field(data, 'name')
         except (ValueError, TypeError, AttributeError):
             data['name'] = ''
 

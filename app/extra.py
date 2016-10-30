@@ -20,10 +20,9 @@ links_file.close()
 
 products_urls = json.loads(urls_string)
 
-# output = open("models/extra/products.json", "wb")
 data = []
 
-print "\nColetando os dados..."
+print "\nColetando os dados... ^^"
 
 for product_url in tqdm(products_urls):
 	try:
@@ -32,7 +31,6 @@ for product_url in tqdm(products_urls):
 		datum = data_extractor.parse()
 		db.insert(datum)
 	except Exception, e:
-		sleep(0.0)
-	sleep(0.01)
+		continue
 
 print "\nFinalizado! :D"
