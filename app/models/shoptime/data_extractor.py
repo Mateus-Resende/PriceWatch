@@ -6,6 +6,7 @@ from lxml import etree
 from helpers.processors import Processors
 from helpers.brands import Brands
 from helpers.memory import Memory
+from helpers.storages import Storages
 from bs4 import BeautifulSoup
 
 
@@ -17,6 +18,7 @@ class DataExtractor:
         self.processors = Processors()
         self.brands = Brands()
         self.memory = Memory()
+        self.storages = Storages()
 
     def parse(self):
 
@@ -61,6 +63,7 @@ class DataExtractor:
         # marca
         try:
 	        data['brand'] = r.find('th', text=re.compile(r'Marca')).parent.find('td').text
+	        data['brand'] = (self.normalize_brand(data['name'])).strip()
         except (ValueError, TypeError, AttributeError):
         	data['brand'] = ''
 		
@@ -91,16 +94,22 @@ class DataExtractor:
         	
         	data['storage'] = self.normalize_storage(hd,ssd)
         except (ValueError, TypeError, AttributeError):
-        	data['storage'] = {}
+        	data['storage'] = self.normalize_storage('','')
         
         
         # tamanho da tela
         try:
-        	data['display_size'] = r.find('th', text=re.compile(r'Polegadas da Tela')).parent.find('td').text
+        	data['display_size'] = self.normalize_display_size(r.find('th', text=re.compile(r'Polegadas da Tela')).parent.find('td').text)
         except (ValueError, TypeError, AttributeError):
         	data['display_size'] = ''
         
-        self.prints(data)
+        try:
+                data['img_url'] = (r.findAll('img', {'class': 'p-image'})[0]['src']).strip()
+        except (ValueError, TypeError, AttributeError, IndexError):
+                data['img_url'] = ''
+
+        print(data)
+        print("______________________________________________________________________________")
         
         return data
 
@@ -115,17 +124,29 @@ class DataExtractor:
     	if data[field] != None:
 	    	return (data[field].get_text().strip() if (len(data[field]) > 0) else '')
 
+    def normalize_display_size(self, text):
+        print("Text---->"+text)
+        if text != None and len(text) > 0:
+            return (text.strip(" \"").replace(",", ".") + "\"").strip()
+        else:
+            return ''
+
     def normalize_storage(self, hd, ssd):
         result = {}
         
         if hd != None and len(hd) > 0:
-        	result['HD'] = re.search('\d+.+[TG]B', hd)
-        	if result['HD'] != None:
-        		result['HD'] = result['HD'].group()    
-		if ssd != None and len(ssd) > 0 and result == None:
-			result['SSD'] = re.search('\d+.+[TG]B', ssd)
-			if result['SSD'] != None:
-				result['SSD'] = result['SSD'].group()
+            result['HD'] = re.search('\d+.+[TG]B', hd)
+            if result['HD'] != None:
+                result['HD'] = self.get_storage_capacity(result['HD'].group())
+        else:
+            result['HD'] = None
+        
+        if ssd != None and len(ssd) > 0:
+            result['SSD'] = re.search('\d+.+[TG]B', ssd)
+            if result['SSD'] != None:
+                result['SSD'] = self.get_storage_capacity(result['SSD'].group())
+        else:
+            result['SSD'] = None
 
         return result
 
@@ -149,27 +170,12 @@ class DataExtractor:
         elif re.search('1', raw_data, re.IGNORECASE) != None:
             return self.memory.get_1GB()
             
-    def prints(self, data):
-		print 'store: ' + data['store']
-		print 'name: ' + data['name']
-		print 'url: ' + data['url']
-		print 'price: '
-		print data['price']
-		print 'available: '
-		print data['available']
-		print 'processor: ' + data['processor']
-		print 'brand: ' + data['brand']
-		print 'ram_memory: ' + data['ram_memory']
-		print 'sku: ' + data['sku']
-		print 'storage: '
-		print data['storage']
-		print 'display_size: ' + data['display_size']
-		print '_________________'
-
     def normalize_price(self, raw_data):
         try:  # transforma 1.000, 00 em 1000.00
             raw_data = (raw_data if len(raw_data) > 0 else '')
-            return float(raw_data)
+            price = float(raw_data)
+            price = round(price, 2)
+            return price
         except ValueError:
             return 0.0
 
@@ -191,6 +197,16 @@ class DataExtractor:
             return self.brands.get_lenovo()
         elif re.search('lg', raw_data, re.IGNORECASE) != None:
             return self.brands.get_lg()
+        elif re.search('compaq', raw_data, re.IGNORECASE) != None:
+            return self.brands.get_compaq()
+        elif re.search('seagate', raw_data, re.IGNORECASE) != None:
+            return self.brands.get_seagate()
+        elif re.search('gigabyte', raw_data, re.IGNORECASE) != None:
+            return self.brands.get_gigabyte()
+        elif (re.search('hp', raw_data, re.IGNORECASE) != None):
+            return self.brands.get_hp()
+        elif (re.search('sony', raw_data, re.IGNORECASE) != None):
+            return self.brands.get_sony()
 
     def normalize_processor(self, raw_data):
         raw_data = re.sub('\\\u\w\w\w\w', '', raw_data)
@@ -229,3 +245,44 @@ class DataExtractor:
         elif re.search('samsung', raw_data, re.IGNORECASE) != None:
 
             return self.processors.get_samsung()
+
+    # normalização de capacidade
+    def get_storage_capacity(self, raw_data):
+        if (re.search('2TB|2 TB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_2tb()
+
+        elif (re.search('1TB|1 TB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_1tb()
+
+        elif (re.search('750 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_750()
+
+        elif (re.search('640 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_640()
+
+        elif (re.search('500 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_500()
+
+        elif (re.search('320GB|320 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_320()
+
+        elif (re.search('256GB|256 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_256()
+
+        elif (re.search('160GB|160 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_160()
+
+        elif (re.search('128GB|128 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_128()
+
+        elif (re.search('80GB|80 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_80()
+
+        elif (re.search('64GB|64 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_64()
+
+        elif (re.search('32GB|32 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_32()
+
+        elif (re.search('16GB|16 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_16()
