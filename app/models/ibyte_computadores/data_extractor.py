@@ -57,6 +57,7 @@ class DataExtractor():
         # memória ram
         try:
             data['ram_memory'] = r.find('td', text=re.compile(u'Memória RAM:')).parent.find('td', {'width': '570'}).text.strip()
+            data['ram_memory'] = self.normalize_memory(data['ram_memory'])
         except (ValueError, TypeError, AttributeError):
             data['ram_memory'] = ''
 
@@ -88,6 +89,12 @@ class DataExtractor():
             data['display_size'] = r.find('td', text=re.compile(r'Polegadas da Tela:')).parent.find('td', {'width': '570'}).text.strip()
         except (ValueError, TypeError, AttributeError):
             data['display_size'] = ''
+
+        #imagem do produto
+        try:
+                data['img_url'] = (r.findAll('img', {'id': 'image'})[0]['src']).strip()
+        except (ValueError, TypeError, AttributeError, IndexError):
+                data['img_url'] = ''
 
         return data
 
