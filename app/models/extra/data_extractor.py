@@ -4,6 +4,7 @@ from helpers.processors import Processors
 from helpers.graphics_processors import Graphics
 from helpers.brands import Brands
 from helpers.memory import Memory
+from helpers.storages import Storages
 from bs4 import BeautifulSoup
 
 
@@ -16,6 +17,7 @@ class DataExtractor():
         self.graphics_processors = Graphics()
         self.brands = Brands()
         self.memory = Memory()
+        self.storages = Storages()
 
     #{ _id, available, brand, color, display_feature, display_size, graphics_processor_name, graphics_processor, name, operating_system, price, processor, ram_memory, sku, screen_resolution, storage, storage_type, url, img_url}
 
@@ -43,7 +45,7 @@ class DataExtractor():
 
         # cor
         data['color'] = self.response.findAll("dl", {"class": "Cor"})
-        data['color'] = data['color'][0].find('dd').get_text().strip()
+        data['color'] = self.validate_color(data['color'])
 
         # processador
         data['processor'] = self.response.findAll("", {"class": "Processador"})
@@ -51,7 +53,7 @@ class DataExtractor():
 
         # placa de video
         data['graphics_processor_name'] = self.response.findAll("dl", {"class": "Placa-de-video"})
-        data['graphics_processor_name'] = data['graphics_processor_name'][0].find('dd').get_text().strip()
+        data['graphics_processor_name'] = data['graphics_processor_name'][0].find('dd').get_text().strip() if (len(data["graphics_processor_name"]) > 0) else ""
         data['graphics_processor_name'] = self.normalize_graphics_processors(data['graphics_processor_name'])
 
         # marca
@@ -65,9 +67,8 @@ class DataExtractor():
         data['sku'] = self.url.split('?')[0].split('-')[-1].split('.')[0]
 
         # armazenamento (SSD/HD)
-        hd = self.response.findAll("dl", {"class": "Disco-rigido--HD-"})
-        ssd = self.response.findAll("dl", {"class": "Memoria-Flash--SSD-"})
-        data['storage'] = self.normalize_storage(hd, ssd)
+        hd = self.response.findAll("dl", {"class": ["Memoria-Flash--SSD-", "Disco-rigido--HD-"]})
+        data['storage'] = self.normalize_storage(hd)
 
         # tamanho de tela
         data['display_size'] = self.response.findAll("dl", {"class": "Tamanho-da-tela"})
@@ -78,24 +79,20 @@ class DataExtractor():
     def validate_field(self, data, field):
         return (data[field][0].get_text().strip() if (len(data[field]) > 0) else "")
 
-    def normalize_storage(self, hd, ssd):
+    def validate_color(self, data):
+        return (data[0].find('dd').get_text().strip() if (len(data) > 0) else "")
+
+    def normalize_storage(self, hd):
         if (len(hd) > 0):
             hd = hd[0].find('dd').get_text()
-        if (len(ssd) > 0):
-            ssd = ssd[0].find('dd').get_text()
 
-        result = {}
+        result = ''
         if hd != None and len(hd) > 0:
-            result["HD"] = re.search('\d+.+[TG]B', hd)
-            if result["HD"] != None:
-                result["HD"] = result["HD"].group()
+            result = re.search('\d+.+[TG]B', hd)
+            if result != None:
+                result = result.group()
 
-        if ssd != None and (len(ssd) > 0) and result == None:
-            result["SSD"] = re.search('\d+.+[TG]B', ssd)
-            if result["SSD"] != None:
-                result["SSD"] = result["SSD"].group()
-
-        return result
+        return self.get_storage_capacity(result)
 
     def normalize_memory(self, raw_data):
         if (re.search('16', raw_data, re.IGNORECASE) != None):
@@ -147,7 +144,7 @@ class DataExtractor():
             return self.brands.get_lg()
 
     def normalize_graphics_processors(self, raw_data):
-        
+
         # remove erros de enconding (ex: \u84d2)
         raw_data = re.sub('\\\u\w\w\w\w', '', raw_data)
 
@@ -198,3 +195,46 @@ class DataExtractor():
 
         elif (re.search("samsung", raw_data, re.IGNORECASE) != None):
             return self.processors.get_samsung()
+
+    def get_storage_capacity(self, raw_data):
+        if (raw_data == None):
+            return
+
+        if (re.search('2TB|2 TB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_2tb()
+
+        elif (re.search('1TB|1 TB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_1tb()
+
+        elif (re.search('750 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_750()
+
+        elif (re.search('640 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_640()
+
+        elif (re.search('500 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_500()
+
+        elif (re.search('320GB|320 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_320()
+
+        elif (re.search('256GB|256 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_256()
+
+        elif (re.search('160GB|160 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_160()
+
+        elif (re.search('128GB|128 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_128()
+
+        elif (re.search('80GB|80 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_80()
+
+        elif (re.search('64GB|64 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_64()
+
+        elif (re.search('32GB|32 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_32()
+
+        elif (re.search('16GB|16 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_16()

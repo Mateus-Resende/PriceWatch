@@ -25,12 +25,13 @@ data = []
 print "\nColetando os dados... ^^"
 
 for product_url in tqdm(products_urls):
-	try:
-		bs_obj = BeautifulSoup(urlopen(product_url['link']).read(), "lxml")
-		data_extractor = DataExtractor(bs_obj, product_url['link'])
-		datum = data_extractor.parse()
-		db.insert(datum)
-	except Exception, e:
-		continue
+    try:
+        bs_obj = BeautifulSoup(urlopen(product_url['link']).read(), "lxml")
+        data_extractor = DataExtractor(bs_obj, product_url['link'])
+        datum = data_extractor.parse()
+        db.insert(datum)
+    except Exception, e:
+        print e
+        continue
 
 print "\nFinalizado! :D"

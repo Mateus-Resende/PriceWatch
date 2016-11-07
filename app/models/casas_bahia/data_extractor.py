@@ -41,6 +41,9 @@ class DataExtractor():
         # disponibilidade: nas casas bahia, se o produto possuir preco, o produto esta disponivel
         data['available'] = data['price'] != None and data['price'] != 0.0
 
+        data['img_url'] = self.response.findAll('img', {'itemprop': 'image'})
+        data['img_url'] = self.normalize_img_url(data['img_url'])
+
         # processador
         data['processor'] = self.response.findAll("", {"class": "Processador"})
         data['processor'] = self.normalize_processor(self.validate_field(data, 'processor'))
@@ -56,9 +59,8 @@ class DataExtractor():
         data['sku'] = self.url.split('?')[0].split('-')[-1].split('.')[0]
 
         # armazenamento (SSD/HD)
-        hd = self.response.findAll("dl", {"class": "Disco-rigido--HD-"})
-        ssd = self.response.findAll("dl", {"class": "Memoria-Flash--SSD-"})
-        data['storage'] = self.normalize_storage(hd, ssd)
+        hd = self.response.findAll("dl", {"class": ["Disco-rigido--HD-", "Memoria-Flash--SSD-"]})
+        data['storage'] = self.normalize_storage(hd)
 
         # tamanho de tela
         data['display_size'] = self.response.findAll("dl", {"class": "Tamanho-da-tela"})
@@ -69,22 +71,18 @@ class DataExtractor():
     def validate_field(self, data, field):
         return (data[field][0].get_text().strip() if (len(data[field]) > 0) else "")
 
-    def normalize_storage(self, hd, ssd):
+    def normalize_img_url(self, img_url):
+        return img_url[0]['src'] if (len(img_url) > 0) else None
+
+    def normalize_storage(self, hd):
         if (len(hd) > 0):
             hd = hd[0].find('dd').get_text()
-        if (len(ssd) > 0):
-            ssd = ssd[0].find('dd').get_text()
 
-        result = {}
+        result = ''
         if hd != None and len(hd) > 0:
-            result["HD"] = re.search('\d+.+[TG]B', hd)
-            if result["HD"] != None:
-                result["HD"] = self.get_storage_capacity(result["HD"].group())
-
-        if ssd != None and (len(ssd) > 0) and result == None:
-            result["SSD"] = re.search('\d+.+[TG]B', ssd)
-            if result["SSD"] != None:
-                result["SSD"] = self.get_storage_capacity(result["SSD"].group())
+            result = re.search('\d+.+[TG]B', hd)
+            if result != None:
+                result = self.get_storage_capacity(result.group())
 
         return result
 

@@ -30,6 +30,8 @@ for product_url in tqdm(products_urls):
         datum = data_extractor.parse()
         db.insert(datum)
     except HTTPError:
+        print '## HTTP Error!'
         continue
     except DuplicateKeyError:
+        print '## Duplicate Key Error'
         continue

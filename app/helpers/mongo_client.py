@@ -14,11 +14,7 @@ class MongoDB:
 
     # método de inserção simples, apenas um dado inserido por vez
     def insert(self, datum):
-        inserted = False
-        self.db.products.insert_one(datum)
-        inserted = True
-
-        return inserted
+        return self.db.products.insert_one(datum)
 
     def find_one(self, store, id):
         return self.db.products.find_one({store: store, sku: id})
@@ -29,3 +25,6 @@ class MongoDB:
     # método de inserção múltipla, vários dados inseridos por vez
     def bulk_insert(data):
         return self.db.products.insert_many(data)
+
+    def get_db(self):
+        return self.db
