@@ -11,6 +11,7 @@ db = client.get_db()
 def run():
     create_parent_by_sku()
     create_parent_by_attributes()
+    create_parent_by_inference()
 
 
 def create_parent_by_sku():
@@ -21,7 +22,7 @@ def create_parent_by_sku():
         if (db.products.count({"sku": sku}) > 1):
             products = db.products.find({"sku": sku})
             parent = create_parent_product(list(products), diversion_index)
-            db.parent_prds.insert(parent)
+            db.parents.insert(parent)
 
 
 def create_parent_by_attributes():
@@ -48,7 +49,40 @@ def create_parent_by_attributes():
                         query['display_size'] = str(display_size)
                         products = db.products.find(query)
                         parent = create_parent_product(list(products), 1)
-                        db.parent_prds.insert(parent)
+                        db.parents.insert(parent)
+
+
+def create_parent_by_inference():
+    attributes = ['brand', 'processor', 'ram_memory', 'storage', 'display_size']
+    count = 4
+
+    for i in range(len(attributes)):
+        create_parent_from_four_attributes(attributes[:count] + attributes[count + 1:])
+        count -= 1
+
+
+def create_parent_from_four_attributes(attributes):
+    query = {}
+    values0 = filter(None, db.products.distinct(attributes[0], query))
+
+    for value0 in values0:
+        query = {}
+        query[attributes[0]] = value0
+        values1 = filter(None, db.products.distinct(attributes[1], query))
+
+        for value1 in values1:
+            query[attributes[1]] = value1
+            values2 = filter(None, db.products.distinct(attributes[2], query))
+
+            for value2 in values2:
+                query[attributes[2]] = value2
+                values3 = filter(None, db.products.distinct(attributes[3], query))
+
+                for value3 in values3:
+                    query[attributes[3]] = value3
+                    products = db.products.find(query)
+                    parent = create_parent_product(list(products), 2)
+                    db.parents.insert(parent)
 
 
 def create_parent_product(products, diversion_index):
