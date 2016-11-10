@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
 from helpers.processors import Processors
-from helpers.graphics_processors import Graphics
 from helpers.brands import Brands
 from helpers.memory import Memory
 from helpers.storages import Storages
@@ -14,7 +13,6 @@ class DataExtractor():
         self.response = response
         self.url = url
         self.processors = Processors()
-        self.graphics_processors = Graphics()
         self.brands = Brands()
         self.memory = Memory()
         self.storages = Storages()
@@ -26,7 +24,7 @@ class DataExtractor():
     def parse(self):
         data = {}
 
-        # produtos do ponto frio
+        # produtos das ponto_frio
         data['store'] = "ponto_frio"
 
         # nome do produto
@@ -40,22 +38,15 @@ class DataExtractor():
         data['price'] = self.response.findAll("i", {"class": "sale price"})
         data['price'] = self.normalize_price(data['price'])
 
-        # disponibilidade: se o produto possuir preco, o produto esta disponivel
+        # disponibilidade: nas ponto_frio, se o produto possuir preco, o produto esta disponivel
         data['available'] = data['price'] != None and data['price'] != 0.0
 
-        # cor
-        data['color'] = self.response.findAll("dl", {"class": "Cor"})
-        data['color'] = data['color'][0].find('dd').get_text().strip() if (len(data["color"]) > 0) else ""
+        data['img_url'] = self.response.findAll('img', {'itemprop': 'image'})
+        data['img_url'] = self.normalize_img_url(data['img_url'])
 
         # processador
         data['processor'] = self.response.findAll("", {"class": "Processador"})
         data['processor'] = self.normalize_processor(self.validate_field(data, 'processor'))
-
-        # placa de video
-        data['graphics_processor_name'] = self.response.findAll("dl", {"class": "Placa-de-video"})
-        data['graphics_processor_name'] = data['graphics_processor_name'][0].find('dd').get_text().strip() if (len(data["graphics_processor_name"]) > 0) else ""
-
-        data['graphics_processor_name'] = self.normalize_graphics_processors(data['graphics_processor_name'])
 
         # marca
         data['brand'] = self.normalize_brand(data['name'])
@@ -73,12 +64,15 @@ class DataExtractor():
 
         # tamanho de tela
         data['display_size'] = self.response.findAll("dl", {"class": "Tamanho-da-tela"})
-        data['display_size'] = data['display_size'][0].find('dd').get_text().strip() if (len(data["display_size"]) > 0) else ""
+        data['display_size'] = data['display_size'][0].find('dd').get_text().strip() if (len(data["display_size"]) < 7) else ""
 
         return data
 
     def validate_field(self, data, field):
         return (data[field][0].get_text().strip() if (len(data[field]) > 0) else "")
+
+    def normalize_img_url(self, img_url):
+        return img_url[0]['src'] if (len(img_url) > 0) else None
 
     def normalize_storage(self, hd):
         if (len(hd) > 0):
@@ -93,28 +87,28 @@ class DataExtractor():
         return result
 
     def normalize_memory(self, raw_data):
-        if (re.search('16', raw_data, re.IGNORECASE) != None):
+        if (re.search('16GB|16 GB', raw_data, re.IGNORECASE) != None):
             return self.memory.get_16GB()
-        elif (re.search('12', raw_data, re.IGNORECASE) != None):
+        elif (re.search('12GB|12 GB', raw_data, re.IGNORECASE) != None):
             return self.memory.get_12GB()
-        elif (re.search('14', raw_data, re.IGNORECASE) != None):
+        elif (re.search('14GB|14 GB', raw_data, re.IGNORECASE) != None):
             return self.memory.get_14GB()
-        elif (re.search('10', raw_data, re.IGNORECASE) != None):
+        elif (re.search('10GB|10 GB', raw_data, re.IGNORECASE) != None):
             return self.memory.get_10GB()
-        elif (re.search('8', raw_data, re.IGNORECASE) != None):
+        elif (re.search('8GB|8 GB', raw_data, re.IGNORECASE) != None):
             return self.memory.get_8GB()
-        elif (re.search('6', raw_data, re.IGNORECASE) != None):
+        elif (re.search('6GB|6 GB', raw_data, re.IGNORECASE) != None):
             return self.memory.get_6GB()
-        elif (re.search('4', raw_data, re.IGNORECASE) != None):
+        elif (re.search('4GB|4 GB', raw_data, re.IGNORECASE) != None):
             return self.memory.get_4GB()
-        elif (re.search('2', raw_data, re.IGNORECASE) != None):
+        elif (re.search('2GB|2 GB', raw_data, re.IGNORECASE) != None):
             return self.memory.get_2GB()
-        elif (re.search('1', raw_data, re.IGNORECASE) != None):
+        elif (re.search('1GB|1 GB', raw_data, re.IGNORECASE) != None):
             return self.memory.get_1GB()
 
+    # transforma 1.000,00 em 1000.00
     def normalize_price(self, raw_data):
         try:
-            # transforma 1.000,00 em 1000.00
             raw_data = raw_data[0].get_text() if (len(raw_data) > 0) else ""
             raw_data = raw_data.replace('.', '').replace(',', '.')
             return float(raw_data)
@@ -122,8 +116,6 @@ class DataExtractor():
             return 0.0
 
     def normalize_brand(self, raw_data):
-        # ["Samsung", "Asus", "Acer", "Dell", "Apple", "Positivo", "LG", "Lenovo"]
-
         if (re.search('dell', raw_data, re.IGNORECASE) != None):
             return self.brands.get_dell()
         elif (re.search('asus', raw_data, re.IGNORECASE) != None):
@@ -140,23 +132,13 @@ class DataExtractor():
             return self.brands.get_lenovo()
         elif (re.search('lg', raw_data, re.IGNORECASE) != None):
             return self.brands.get_lg()
+        elif (re.search('hp', raw_data, re.IGNORECASE) != None):
+            return self.brands.get_hp()
+        elif (re.search('sony', raw_data, re.IGNORECASE) != None):
+            return self.brands.get_sony()
 
-    def normalize_graphics_processors(self, raw_data):
-
-        # remove erros de enconding (ex: \u84d2)
-        raw_data = re.sub('\\\u\w\w\w\w', '', raw_data)
-
-        if (re.search("Intel", raw_data, re.IGNORECASE) != None):
-            return self.graphics_processors.get_intel()
-
-        elif (re.search("NVIDIA GeForce", raw_data, re.IGNORECASE) != None):
-            return self.graphics_processors.get_geforce()
-
-        elif (re.search("AMD Radeon", raw_data, re.IGNORECASE) != None):
-            return self.graphics_processors.get_amd()
-
+    # ['Intel Core i3', 'Intel Core i5', 'Intel Core i7', 'Intem Pentium Quad Core', 'Intel Baytrail', 'AMD Dual Core', 'Item Atom', 'Intel Core M', 'Intel Celeron']
     def normalize_processor(self, raw_data):
-        # ['Intel Core i3', 'Intel Core i5', 'Intel Core i7', 'Intem Pentium Quad Core', 'Intel Baytrail', 'AMD Dual Core', 'Item Atom', 'Intel Core M', 'Intel Celeron']
 
         # remove erros de enconding (ex: \u84d2)
         raw_data = re.sub('\\\u\w\w\w\w', '', raw_data)
@@ -176,6 +158,12 @@ class DataExtractor():
         elif (re.search("byt|baytrail", raw_data, re.IGNORECASE) != None):
             return self.processors.get_baytrail()
 
+        elif (re.search('Intel.+[Dd]ual [Cc]ore', raw_data, re.IGNORECASE) != None):
+            return self.processors.get_intel_dual()
+
+        elif (re.search('Intel.+[Qq]uad [Cc]ore', raw_data, re.IGNORECASE) != None):
+            return self.processors.get_intel_quad()
+
         elif (re.search("amd.+dual core", raw_data, re.IGNORECASE) != None):
             return self.processors.get_amd_dual()
 
@@ -194,10 +182,8 @@ class DataExtractor():
         elif (re.search("samsung", raw_data, re.IGNORECASE) != None):
             return self.processors.get_samsung()
 
+    # normalização de capacidade
     def get_storage_capacity(self, raw_data):
-        if (raw_data == None):
-            return
-
         if (re.search('2TB|2 TB', raw_data, re.IGNORECASE) != None):
             return self.storages.get_2tb()
 
