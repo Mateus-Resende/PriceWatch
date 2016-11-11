@@ -5,6 +5,9 @@ from helpers.mongo_client import MongoDB
 from models.magazine_luiza.data_extractor import DataExtractor
 from urllib2 import urlopen
 from bs4 import BeautifulSoup
+from urllib2 import HTTPError
+from pymongo.errors import DuplicateKeyError
+from tqdm import tqdm
 
 import json
 
@@ -20,8 +23,15 @@ products_urls = json.loads(urls_string)
 # output = open("models/casas_bahia/products.json", "wb")
 data = []
 
-for product_url in products_urls:
-    bs_obj = BeautifulSoup(urlopen(product_url['link']).read(), "lxml")
-    data_extractor = DataExtractor(bs_obj, product_url['link'])
-    datum = data_extractor.parse()
-    db.insert(datum)
+for product_url in tqdm(products_urls):
+    try:
+        bs_obj = BeautifulSoup(urlopen(product_url['link']).read(), "lxml")
+        data_extractor = DataExtractor(bs_obj, product_url['link'])
+        datum = data_extractor.parse()
+        db.insert(datum)
+    except HTTPError:
+        print "Http error"
+        continue
+    except DuplicateKeyError:
+        print "Duplicate key error"
+        continue

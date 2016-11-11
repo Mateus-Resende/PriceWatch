@@ -14,7 +14,9 @@ class MongoDB:
 
     # método de inserção simples, apenas um dado inserido por vez
     def insert(self, datum):
-        return self.db.products.insert_one(datum)
+        if datum["sku"] != None and datum["sku"] != "" and datum["store"] != None:
+            datum['processed'] = False
+            return self.db.products.insert_one(datum)
 
     def find_one(self, store, id):
         return self.db.products.find_one({store: store, sku: id})

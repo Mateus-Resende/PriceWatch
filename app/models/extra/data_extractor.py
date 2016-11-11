@@ -41,7 +41,7 @@ class DataExtractor():
         # preco do produto
         data['price'] = self.response.findAll("i", {"class": "sale price"})
         data['price'] = self.normalize_price(data['price'])
-        
+
         # disponibilidade: nas extra, se o produto possuir preco, o produto esta disponivel
         data['available'] = data['price'] != None and data['price'] != 0.0
 
@@ -72,7 +72,7 @@ class DataExtractor():
 
         # tamanho de tela
         data['display_size'] = self.response.findAll("dl", {"class": "Tamanho-da-tela"})
-        data['display_size'] = data['display_size'][0].find('dd').get_text().strip() if (len(data["display_size"]) < 7) else ""
+        data['display_size'] = data['display_size'][0].find('dd').get_text().strip() if (len(data["display_size"]) > 0) else ""
 
         return data
 

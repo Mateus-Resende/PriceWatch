@@ -65,28 +65,11 @@ class DataExtractor():
         # tamanho de tela
         data['display_size'] = self.response.xpath('//*[@id="productdetails"]/div[3]/section/table/tbody/tr[4]/td/text()')[0].strip()
         data['display_size'] = data['display_size'][0].find('dd').get_text().strip() if (len(data["display_size"]) > 0) else ""
-        
-        print data
+
         return data
-
-
-
-
-
-
-
-
-
 
     def validate_field(self, data, field):
         return (data[field][0].get_text().strip() if (len(data[field]) > 0) else "")
-
-
-
-
-
-
-
 
     def normalize_storage(self, hd, ssd):
         if (len(hd) > 0):
@@ -94,25 +77,16 @@ class DataExtractor():
         if (len(ssd) > 0):
             ssd = ssd[0].find('dd').get_text()
 
-        result = {}
+        result = ''
         if hd != None and len(hd) > 0:
-            result["HD"] = re.search('\d+.+[TG]B', hd)
-            if result["HD"] != None:
-                result["HD"] = result["HD"].group()
+            result = re.search('\d+.+[TG]B', hd)
+            if result != None:
+                return self.get_storage_capacity(result.group())
 
-        if ssd != None and (len(ssd) > 0) and result == None:
-            result["SSD"] = re.search('\d+.+[TG]B', ssd)
-            if result["SSD"] != None:
-                result["SSD"] = result["SSD"].group()
-
-        return result
-
-
-
-
-
-
-
+        if ssd != None and len(ssd) > 0:
+            result = re.search('\d+.+[TG]B', ssd)
+            if result != None:
+                return self.get_storage_capacity(result.group())
 
     def normalize_memory(self, raw_data):
         if (re.search('16', raw_data, re.IGNORECASE) != None):
@@ -134,12 +108,6 @@ class DataExtractor():
         elif (re.search('1', raw_data, re.IGNORECASE) != None):
             return self.memory.get_1GB()
 
-
-
-
-
-
-
     def normalize_price(self, raw_data):
         try:
             # transforma 1.000,00 em 1000.00
@@ -148,12 +116,6 @@ class DataExtractor():
             return float(raw_data)
         except ValueError:
             return 0.0
-
-
-
-
-
-
 
     def normalize_brand(self, raw_data):
         # ["Samsung", "Asus", "Acer", "Dell", "Apple", "Positivo", "LG", "Lenovo"]
@@ -174,14 +136,6 @@ class DataExtractor():
             return self.brands.get_lenovo()
         elif (re.search('lg', raw_data, re.IGNORECASE) != None):
             return self.brands.get_lg()
-
-
-
-
-
-
-
-
 
     def normalize_processor(self, raw_data):
         # ['Intel Core i3', 'Intel Core i5', 'Intel Core i7', 'Intem Pentium Quad Core', 'Intel Baytrail', 'AMD Dual Core', 'Item Atom', 'Intel Core M', 'Intel Celeron']
@@ -221,3 +175,43 @@ class DataExtractor():
 
         elif (re.search("samsung", raw_data, re.IGNORECASE) != None):
             return self.processors.get_samsung()
+
+    def get_storage_capacity(self, raw_data):
+        if (re.search('2TB|2 TB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_2tb()
+
+        elif (re.search('1TB|1 TB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_1tb()
+
+        elif (re.search('750 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_750()
+
+        elif (re.search('640 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_640()
+
+        elif (re.search('500 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_500()
+
+        elif (re.search('320GB|320 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_320()
+
+        elif (re.search('256GB|256 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_256()
+
+        elif (re.search('160GB|160 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_160()
+
+        elif (re.search('128GB|128 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_128()
+
+        elif (re.search('80GB|80 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_80()
+
+        elif (re.search('64GB|64 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_64()
+
+        elif (re.search('32GB|32 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_32()
+
+        elif (re.search('16GB|16 GB', raw_data, re.IGNORECASE) != None):
+            return self.storages.get_16()

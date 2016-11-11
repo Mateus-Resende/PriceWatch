@@ -1,11 +1,13 @@
-from tqdm import tqdm
 # coding: utf-8
 
 from helpers.processors import Processors
 from helpers.mongo_client import MongoDB
 from models.extra.data_extractor import DataExtractor
 from urllib2 import urlopen
+from urllib2 import HTTPError
+from pymongo.errors import DuplicateKeyError
 from bs4 import BeautifulSoup
+from tqdm import tqdm
 
 import json
 
@@ -22,12 +24,15 @@ products_urls = json.loads(urls_string)
 
 data = []
 
-print "\nColetando os dados... ^^"
-
 for product_url in tqdm(products_urls):
-    bs_obj = BeautifulSoup(urlopen(product_url['link']).read(), "lxml")
-    data_extractor = DataExtractor(bs_obj, product_url['link'])
-    datum = data_extractor.parse()
-    db.insert(datum)
-
-print "\nFinalizado! :D"
+    try:
+        bs_obj = BeautifulSoup(urlopen(product_url['link']).read(), "lxml")
+        data_extractor = DataExtractor(bs_obj, product_url['link'])
+        datum = data_extractor.parse()
+        db.insert(datum)
+    except HTTPError:
+        print "Http error"
+        continue
+    except DuplicateKeyError:
+        print "Duplicate key error"
+        continue

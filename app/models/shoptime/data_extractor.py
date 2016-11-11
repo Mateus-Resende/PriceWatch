@@ -25,130 +25,118 @@ class DataExtractor:
         data = {}
 
         r = self.response
-        
+
         # produtos da shoptime
         data['store'] = 'shoptime'
-		
-		# nome do produto
+
+        # nome do produto
         try:
-        	data['name'] = r.find('h1', {'id': 'main-product-name'})
-        	data['name'] = self.validate_field(data, 'name')
-        	data['name'] = re.sub(re.compile(u' \(Cód\. ([0-9])+\)'), '', data['name'])
+            data['name'] = r.find('h1', {'id': 'main-product-name'})
+            data['name'] = self.validate_field(data, 'name')
+            data['name'] = re.sub(re.compile(u' \(Cód\. ([0-9])+\)'), '', data['name'])
         except (ValueError, TypeError, AttributeError):
-        	data['name'] = ''
-		
-		# url como variavel global da classe
+            data['name'] = ''
+
+            # url como variavel global da classe
         data['url'] = self.url
-				
-		# preço do produto
+
+        # preço do produto
         try:
-        	data['price'] = r.find('span', {'data-partner-value': True})['data-partner-value']
-        	data['price'] = self.normalize_price(data['price'])
+            data['price'] = r.find('span', {'data-partner-value': True})['data-partner-value']
+            data['price'] = self.normalize_price(data['price'])
         except (ValueError, TypeError, AttributeError):
-        	data['price'] = 0.0
-        
+            data['price'] = 0.0
+
         # disponibilidade
         try:
-        	data['available'] = self.set_available(r, data['price'])
+            data['available'] = self.set_available(r, data['price'])
         except (ValueError, TypeError, AttributeError):
-        	data['available'] = False
-        
+            data['available'] = False
+
         try:
-        	# processador
-        	data['processor'] = r.find('th', text=re.compile(r'Processador')).parent.find('td').text
-        	data['processor'] = self.normalize_processor(data['processor'])
+            # processador
+            data['processor'] = r.find('th', text=re.compile(r'Processador')).parent.find('td').text
+            data['processor'] = self.normalize_processor(data['processor'])
         except (ValueError, TypeError, AttributeError):
-        	data['processor'] = ''
-		           
+            data['processor'] = ''
+
         # marca
         try:
-	        data['brand'] = r.find('th', text=re.compile(r'Marca')).parent.find('td').text
-	        data['brand'] = (self.normalize_brand(data['name'])).strip()
+            data['brand'] = r.find('th', text=re.compile(r'Marca')).parent.find('td').text
+            data['brand'] = (self.normalize_brand(data['name'])).strip()
         except (ValueError, TypeError, AttributeError):
-        	data['brand'] = ''
-		
-		# memória ram
+            data['brand'] = ''
+
+            # memória ram
         try:
-        	data['ram_memory'] = r.find('th', text=re.compile(u'Memória RAM')).parent.find('td').text
+            data['ram_memory'] = r.find('th', text=re.compile(u'Memória RAM')).parent.find('td').text
         except (ValueError, TypeError, AttributeError):
-        	data['ram_memory'] = ''
-		
-		# sku para identificação
+            data['ram_memory'] = ''
+
+            # sku para identificação
         try:
-        	data['sku'] = r.find('div', {'data-sku': True})['data-sku']
+            data['sku'] = r.find('div', {'data-sku': True})['data-sku']
         except (ValueError, TypeError, AttributeError):
-        	data['sku'] = ''
-        
+            data['sku'] = ''
+
         # armazenamento (SSD/HD)
         try:
-        
-        	try:
-        		hd = r.find('th', text=re.compile(r'HD')).parent.find('td').text
-        	except (ValueError, TypeError, AttributeError):
-        		hd = ''
-        	
-        	try:
-        		ssd = r.find('th', text=re.compile(r'SSD')).parent.find('td').text
-        	except (ValueError, TypeError, AttributeError):
-        		ssd = ''
-        	
-        	data['storage'] = self.normalize_storage(hd,ssd)
+
+            try:
+                hd = r.find('th', text=re.compile(r'HD')).parent.find('td').text
+            except (ValueError, TypeError, AttributeError):
+                hd = ''
+
+            try:
+                ssd = r.find('th', text=re.compile(r'SSD')).parent.find('td').text
+            except (ValueError, TypeError, AttributeError):
+                ssd = ''
+
+            data['storage'] = self.normalize_storage(hd, ssd)
         except (ValueError, TypeError, AttributeError):
-        	data['storage'] = self.normalize_storage('','')
-        
-        
+            data['storage'] = self.normalize_storage('', '')
+
         # tamanho da tela
         try:
-        	data['display_size'] = self.normalize_display_size(r.find('th', text=re.compile(r'Polegadas da Tela')).parent.find('td').text)
+            data['display_size'] = self.normalize_display_size(r.find('th', text=re.compile(r'Polegadas da Tela')).parent.find('td').text)
         except (ValueError, TypeError, AttributeError):
-        	data['display_size'] = ''
-        
-        try:
-                data['img_url'] = (r.findAll('img', {'class': 'p-image'})[0]['src']).strip()
-        except (ValueError, TypeError, AttributeError, IndexError):
-                data['img_url'] = ''
+            data['display_size'] = ''
 
-        print(data)
-        print("______________________________________________________________________________")
-        
+        try:
+            data['img_url'] = (r.findAll('img', {'class': 'p-image'})[0]['src']).strip()
+        except (ValueError, TypeError, AttributeError, IndexError):
+            data['img_url'] = ''
+
         return data
 
     def set_available(self, response, price):
         meta = response.find('div', {'class': 'product-unavailable'})
         if (meta == None) and (price != 0.0):
-        	return True
+            return True
         else:
-        	return False
+            return False
 
     def validate_field(self, data, field):
-    	if data[field] != None:
-	    	return (data[field].get_text().strip() if (len(data[field]) > 0) else '')
+        if data[field] != None:
+            return (data[field].get_text().strip() if (len(data[field]) > 0) else '')
 
     def normalize_display_size(self, text):
-        print("Text---->"+text)
         if text != None and len(text) > 0:
             return (text.strip(" \"").replace(",", ".") + "\"").strip()
         else:
             return ''
 
     def normalize_storage(self, hd, ssd):
-        result = {}
-        
+        result = ''
         if hd != None and len(hd) > 0:
-            result['HD'] = re.search('\d+.+[TG]B', hd)
-            if result['HD'] != None:
-                result['HD'] = self.get_storage_capacity(result['HD'].group())
-        else:
-            result['HD'] = None
-        
-        if ssd != None and len(ssd) > 0:
-            result['SSD'] = re.search('\d+.+[TG]B', ssd)
-            if result['SSD'] != None:
-                result['SSD'] = self.get_storage_capacity(result['SSD'].group())
-        else:
-            result['SSD'] = None
+            result = re.search('\d+.+[TG]B', hd)
+            if result != None:
+                return self.get_storage_capacity(result.group())
 
-        return result
+        if ssd != None and len(ssd) > 0:
+            result = re.search('\d+.+[TG]B', ssd)
+            if result != None:
+                return self.get_storage_capacity(result.group())
 
     def normalize_memory(self, raw_data):
         if re.search('16', raw_data, re.IGNORECASE) != None:
@@ -169,7 +157,7 @@ class DataExtractor:
             return self.memory.get_2GB()
         elif re.search('1', raw_data, re.IGNORECASE) != None:
             return self.memory.get_1GB()
-            
+
     def normalize_price(self, raw_data):
         try:  # transforma 1.000, 00 em 1000.00
             raw_data = (raw_data if len(raw_data) > 0 else '')
@@ -226,14 +214,14 @@ class DataExtractor:
 
             return self.processors.get_baytrail()
         elif re.search('amd.+dual core', raw_data, re.IGNORECASE) \
-            != None:
+                != None:
 
             return self.processors.get_amd_dual()
         elif re.search('atom', raw_data, re.IGNORECASE) != None:
 
             return self.processors.get_atom()
         elif re.search('Intel.+Core.+M', raw_data, re.IGNORECASE) \
-            != None:
+                != None:
 
             return self.processors.get_core_m()
         elif re.search('Celeron', raw_data, re.IGNORECASE) != None:

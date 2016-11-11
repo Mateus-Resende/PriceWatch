@@ -20,16 +20,17 @@ def create_parent_by_sku():
 
     for sku in skus:
         if (db.products.count({"sku": sku}) > 1):
-            products = db.products.find({"sku": sku})
+            products = db.products.find({"sku": sku, 'processed': False})
             parent = create_parent_product(list(products), diversion_index)
-            db.parents.insert(parent)
+            if parent != None:
+                db.parents.insert(parent)
 
 
 def create_parent_by_attributes():
     brands = filter(None, db.products.distinct('brand'))
 
     for brand in brands:
-        query = {}
+        query = {'processed': False}
         query['brand'] = str(brand)
         processors = filter(None, db.products.distinct('processor', query))
 
@@ -47,9 +48,12 @@ def create_parent_by_attributes():
 
                     for display_size in display_sizes:
                         query['display_size'] = str(display_size)
+                        query['processed'] = False
                         products = db.products.find(query)
-                        parent = create_parent_product(list(products), 1)
-                        db.parents.insert(parent)
+                        if products.count() >= 0:
+                            parent = create_parent_product(list(products), 1)
+                            if parent != None:
+                                db.parents.insert(parent)
 
 
 def create_parent_by_inference():
@@ -62,11 +66,11 @@ def create_parent_by_inference():
 
 
 def create_parent_from_four_attributes(attributes):
-    query = {}
+    query = {'processed': False}
     values0 = filter(None, db.products.distinct(attributes[0], query))
 
     for value0 in values0:
-        query = {}
+        query = {'processed': False}
         query[attributes[0]] = value0
         values1 = filter(None, db.products.distinct(attributes[1], query))
 
@@ -82,27 +86,31 @@ def create_parent_from_four_attributes(attributes):
                     query[attributes[3]] = value3
                     products = db.products.find(query)
                     parent = create_parent_product(list(products), 2)
-                    db.parents.insert(parent)
+                    if parent != None:
+                        db.parents.insert(parent)
 
 
 def create_parent_product(products, diversion_index):
-    parent_product = {}
+    if products == None or len(products) <= 0:
+        return None
+    else:
+        parent_product = {}
 
-    parent_product['storage'] = get_attribute(products, 'storage')
-    parent_product['name'] = get_attribute(products, 'name')
-    parent_product['processor'] = get_attribute(products, 'processor')
-    parent_product['ram_memory'] = get_attribute(products, 'ram_memory')
-    parent_product['display_size'] = get_attribute(products, 'display_size')
-    parent_product['brand'] = get_attribute(products, 'brand')
-    try:
-        parent_product['model'] = get_attribute(products, 'model')
-    except KeyError, e:
-        pass
-    parent_product['children'] = get_children_products(products)
-    parent_product['stores'] = get_stores(products)
-    parent_product['diversion_index'] = diversion_index
+        parent_product['storage'] = get_attribute(products, 'storage')
+        parent_product['name'] = get_attribute(products, 'name')
+        parent_product['processor'] = get_attribute(products, 'processor')
+        parent_product['ram_memory'] = get_attribute(products, 'ram_memory')
+        parent_product['display_size'] = get_attribute(products, 'display_size')
+        parent_product['brand'] = get_attribute(products, 'brand')
+        try:
+            parent_product['model'] = get_attribute(products, 'model')
+        except KeyError, e:
+            pass
+        parent_product['children'] = get_children_products(products)
+        parent_product['stores'] = get_stores(products)
+        parent_product['diversion_index'] = diversion_index
 
-    return parent_product
+        return parent_product
 
 
 def get_attribute(products, attr_name):
@@ -118,6 +126,7 @@ def get_children_products(products):
     children = []
     for product in products:
         children.append(product[u'_id'])
+        db.products.update({'_id': product[u'_id']}, {"$set": {"processed": True}}, True, False)
     return children
 
 
